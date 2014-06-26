@@ -1,0 +1,30 @@
+{
+  "name": "fake-server",
+  "version": "0.1.0",
+  "description": "Fake-server: mock the internet.",
+  "main": "server.js",
+  "license": "BSD",
+  "author": "Yahoo!",
+  "contributors": [
+    "bigodines <matheus@yahoo-inc.com>",
+    "Julio Nobrega <julionn@yahoo-inc.com>"
+  ],
+  "scripts": {
+    "test": "./node_modules/.bin/mocha -c --recursive -R spec"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:yahoo/fake-server.git"
+  },
+  "readmeFilename": "README.md",
+  "devDependencies": {
+    "mocha": "~1.18.2",
+    "jshint": "~2.5.0",
+    "sinon": "~1.9.1",
+    "chai": "=1.9.1"
+  },
+  "dependencies": {
+    "restify": "=2.6.2",
+    "sinon-chai": "~2.5.0"
+  }
+}
