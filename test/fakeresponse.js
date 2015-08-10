@@ -3,11 +3,14 @@
  * Copyrights licensed under the New BSD License.
  * See the accompanying LICENSE file for terms.
  */
-
+/*jshint node:true */
+/* global describe, beforeEach, it */
 'use strict';
 
-var model = require('../fakeresponse.js');
+var rewire = require('rewire');
+var model = rewire('../fakeresponse.js');
 var assert = require('chai').assert;
+var when = require('when');
 
 describe('FakeResponse model tests', function () {
     beforeEach(function () {
@@ -106,7 +109,22 @@ describe('FakeResponse model tests', function () {
         assert.equal(204, secondReq.responseCode);
         var thirdReq = model.match('/match/me');
         assert.equal(200, thirdReq.responseCode);
-
     });
 
+    it('should allow user to load pre-configured routes from ./default_routes/', function (done) {
+        // TODO: mock "glob" with rewire.
+        model.preload().then(function () {
+            assert.equal(2, model._items.length);
+            var firstRoute = model.getAll()[0];
+            assert.equal('/mock/0', firstRoute.route)
+            assert.equal(200, firstRoute.responseCode);
+            var secondRoute = model.getAll()[1];
+            assert.equal('/mock/1', secondRoute.route)
+            assert.equal(200, secondRoute.responseCode);
+            done();
+        }).catch(function(e) {
+            console.log(e);
+            assert.ok(false,'should not throw exceptions on a controlled test environemnt');
+        });
+    });
 });

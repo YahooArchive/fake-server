@@ -1,0 +1,13 @@
+{ 
+    "routes":
+    [{ 
+        "route": "/mock/0",
+        "responseCode":200,
+        "responseBody": "it works"
+    },
+    {
+        "route": "/mock/1",
+        "responseCode":200,
+        "responseData": "mock_data/sample.json"
+    }]
+}
