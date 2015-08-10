@@ -8,6 +8,6 @@
     {
         "route": "/mock/1",
         "responseCode":200,
-        "responseData": "mock_data/sample.json"
+        "responseData": "./mock_data/sample.json"
     }]
 }

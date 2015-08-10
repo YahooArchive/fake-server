@@ -8,6 +8,9 @@
 
 var FakeResponse = require('./fakeresponse.js');
 
+// Preload routes 
+FakeResponse.preload();
+
 var controller = {
     fakeResponse: FakeResponse, // of course this is here just so that it can be overwritten easily in the tests.
 
