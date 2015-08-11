@@ -4,10 +4,36 @@
  * See the accompanying LICENSE file for terms.
  */
 
+/*jshint node:true */
 'use strict';
+
+var fs = require('fs');
+var glob = require('glob');
+var path = require('path');
+var when = require('when');
 
 var FakeResponse = {
     _items: [],
+
+    preload: function(pathToConfiguration) {
+        return when.promise(function(resolve, reject) {
+            var configDir = pathToConfiguration || path.join(__dirname, 'default_routes');
+            glob.sync('*.json', {cwd:configDir})
+                .forEach(function eachFile(file) {
+                    var contents = fs.readFileSync(path.join(configDir,file), 'utf8');
+                    try {
+                        var allRoutes = JSON.parse(contents);
+                        allRoutes.routes.forEach(function(configLine) {
+                            FakeResponse.add(configLine);
+                        });
+                    } catch(e) {
+                        console.log('Wrong configuration format');
+                        reject(e);
+                    }
+                });
+            return resolve(FakeResponse.getAll());
+        });
+    },
 
     getAll: function () {
         return FakeResponse._items;
