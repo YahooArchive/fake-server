@@ -6,6 +6,8 @@
 
 'use strict';
 
+var fs = require('fs');
+var path = require('path');
 var FakeResponse = require('./fakeresponse.js');
 
 // Preload routes 
@@ -34,7 +36,17 @@ var controller = {
 
         if (bestMatch) {
             res.setHeader('Content-type', 'text/plain'); // overwrites default octetstream header.
-            res.send(parseInt(bestMatch.responseCode, 10), bestMatch.responseBody);
+
+            if(bestMatch.responseData) {
+                fs.readFile(path.join(__dirname, bestMatch.responseData),'utf8', function(err, data) {
+                    if (err) {
+                        res.send(500, "FAKE-SERVER is misconfigured");
+                    }
+                    res.send(parseInt(bestMatch.responseCode, 10), data);
+                });
+            } else {
+                res.send(parseInt(bestMatch.responseCode, 10), bestMatch.responseBody);
+            }
 
             if (bestMatch.delay) {
                 setTimeout(next, bestMatch.delay);
