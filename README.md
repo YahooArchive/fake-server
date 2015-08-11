@@ -8,7 +8,7 @@ Fake-server is a generic and non-intrusive tool used to mock any server response
 
 ### How it works
 
-The idea is to create a webserver listening in a different port and make your tests bring it up and configure how it should behave against each different request. "Configuration" is done by posting the parameters and desired response to the server.
+The idea is to create a webserver listening in a different port and make your tests bring it up and configure how it should behave against each different request. "Configuration" can be done by posting the parameters and desired response to the server, or through configuration files inside ./default_routes/.
 
 For every request, fake-server will try to match against the configured URIs and return the expected response.
 
@@ -60,7 +60,7 @@ http://localhost:3012/test
 
 ### What else can fake-server do?
 
-Configuration is done by sending a POST request to /add. Here are the supported features for this version:  
+Configuration is done by sending a POST request to /add or by placing a json file containing configurations inside a "routes" object (see default_routes/sample.json for reference). Here are the supported features for this version:  
 
 ##### Routes can be RegEx
 
@@ -69,6 +69,15 @@ This will match http://localhost:3012/news/007 as well as http://localhost:3012/
 > { route: '/news/[0-9]'  
 > responseCode: 200,  
 > responseBody: 'whatever you want' }  
+
+##### Response can be a file. In this case, fake-server will respond with the output of that file.
+
+The following configuration example will return the output of ./mock_data/sample.json *(notice the parameter is called responseData instead of responseBody)*
+
+> { route: '/',  
+> responseCode: 200,  
+> responseData: './mock_data/sample.json' }  
+
 
 ##### Same endpoint can have different responses 
 
