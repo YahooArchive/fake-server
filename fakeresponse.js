@@ -18,6 +18,7 @@ var FakeResponse = {
     preload: function(pathToConfiguration) {
         return when.promise(function(resolve, reject) {
             var configDir = pathToConfiguration || path.join(__dirname, 'default_routes');
+            console.log('loading config from: ',configDir);
             glob.sync('*.json', {cwd:configDir})
                 .forEach(function eachFile(file) {
                     var contents = fs.readFileSync(path.join(configDir,file), 'utf8');

@@ -4,14 +4,16 @@
  * See the accompanying LICENSE file for terms.
  */
 
+/*jshint node:true */
 'use strict';
 
 var fs = require('fs');
 var path = require('path');
+var argv = require('yargs').argv;
 var FakeResponse = require('./fakeresponse.js');
 
 // Preload routes 
-FakeResponse.preload();
+FakeResponse.preload(argv.configDir);
 
 var controller = {
     fakeResponse: FakeResponse, // of course this is here just so that it can be overwritten easily in the tests.

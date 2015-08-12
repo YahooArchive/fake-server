@@ -10,7 +10,8 @@
     "Julio Nobrega <julionn@yahoo-inc.com>"
   ],
   "scripts": {
-    "test": "./node_modules/.bin/mocha -c --recursive -R spec"
+    "test": "./node_modules/.bin/mocha -c --recursive -R spec",
+    "start": "node server.js"
   },
   "repository": {
     "type": "git",
@@ -28,6 +29,7 @@
     "restify": "=2.6.2",
     "rewire": "~2.3.4",
     "sinon-chai": "~2.5.0",
-    "when": "~3.7.3"
+    "when": "~3.7.3",
+    "yargs": "~3.18.0"
   }
 }
