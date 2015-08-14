@@ -11,6 +11,7 @@ var fs = require('fs');
 var path = require('path');
 var argv = require('yargs').argv;
 var FakeResponse = require('./fakeresponse.js');
+var merge = require('merge');
 
 // Preload routes 
 FakeResponse.preload(argv.configDir);
@@ -34,20 +35,34 @@ var controller = {
     },
 
     match: function (req, res, next) {
+        
+        function send (statusCode, responseHeaders, responseBody) {
+            responseHeaders['Content-Length'] = Buffer.byteLength(responseBody);
+            res.writeHead(statusCode, responseHeaders);
+            res.write(responseBody);
+            res.end();
+        }
+
         var bestMatch = controller.fakeResponse.match(req.url);
 
         if (bestMatch) {
-            res.setHeader('Content-type', 'text/plain'); // overwrites default octetstream header.
-
+            var headers = {
+                'Content-Type': 'application/json'
+            };
+            if(bestMatch.responseHeaders) {
+                headers = merge(headers, bestMatch.responseHeaders);
+            }
             if(bestMatch.responseData) {
+
                 fs.readFile(path.join(__dirname, bestMatch.responseData),'utf8', function(err, data) {
                     if (err) {
                         res.send(500, "FAKE-SERVER is misconfigured");
-                    }
-                    res.send(parseInt(bestMatch.responseCode, 10), data);
+                    } 
+                    send(parseInt(bestMatch.responseCode, 10), headers, data);
                 });
+                
             } else {
-                res.send(parseInt(bestMatch.responseCode, 10), bestMatch.responseBody);
+                send(parseInt(bestMatch.responseCode, 10), headers, bestMatch.responseBody);
             }
 
             if (bestMatch.delay) {

@@ -80,23 +80,28 @@ describe('Integration tests', function () {
         };
 
         var res = {
-            send: sinon.stub(),
-            setHeader: sinon.stub(),
+            write: sinon.stub(),
+            writeHead: sinon.stub(),
+            end: sinon.stub()
         };
 
         controller.fakeResponse._items = responses;
 
         controller.match(req, res, function () {});
-        res.send.lastCall.calledWithExactly(200, 'OK');
+        res.writeHead.lastCall.calledWithExactly(200,  {'Content-Type' : 'application/json'});
+        res.write.lastCall.calledWithExactly('OK');
 
         controller.match(req, res, function () {});
-        res.send.lastCall.calledWithExactly(200, 'OK');
+        res.writeHead.lastCall.calledWithExactly(200,  {'Content-Type' : 'application/json'});
+        res.write.lastCall.calledWithExactly('OK');
 
         controller.match(req, res, function () {});
-        res.send.lastCall.calledWithExactly(403, 'yay!');
+        res.writeHead.lastCall.calledWithExactly(200,  {'Content-Type' : 'application/json'});
+        res.write.lastCall.calledWithExactly('yay!');
 
         controller.match(req, res, function () {});
-        res.send.lastCall.calledWithExactly(200, 'OK');
+        res.writeHead.lastCall.calledWithExactly(200,  {'Content-Type' : 'application/json'});
+        res.write.lastCall.calledWithExactly('OK');
     });
 
     it('should replace incoming &quot; by " so un-encoded quotes are returned', function () {
@@ -137,11 +142,16 @@ describe('Integration tests', function () {
                 }
             },
             res = {
-                send: sinon.stub(),
+                write: sinon.stub(),
+                writeHead: sinon.stub(),
                 setHeader: sinon.stub(),
+                end: sinon.stub(),
+                send: sinon.stub()
             };
 
         controller.add(req, res, function () {});
+
+        
 
         controller.match({
             url: '/delayed',
@@ -156,6 +166,43 @@ describe('Integration tests', function () {
         assert.isTrue(next.calledOnce);
 
         clock.restore();
+
+        done();
+    });
+
+
+    it('Should Default to header application/json', function (done) {
+        var next = sinon.stub(),
+
+            obj = {
+                route: '/abc',
+                responseCode: 200,
+                responseBody: 'OK'
+            },
+            req = {
+                params: {
+                    route: '/abc',
+                }
+            },
+            
+            res = {
+                send: sinon.stub(),
+                write: sinon.stub(),
+                writeHead: sinon.stub(),
+                end: sinon.stub()
+            };
+
+        controller.fakeResponse.add(obj);
+
+        controller.match({
+            url: '/abc',
+        }, res, next);
+
+        
+        assert.isTrue(res.writeHead.calledWithExactly(200, {'Content-Type': 'application/json', 'Content-Length': 2}));
+        assert.isTrue(res.write.calledWithExactly('OK'));
+        assert.isTrue(res.end.calledOnce);
+
         done();
     });
 });
