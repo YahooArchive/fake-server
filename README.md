@@ -74,13 +74,13 @@ This will match http://localhost:3012/news/007 as well as http://localhost:3012/
 
 NOTE: payload matching does not support RegEx yet. Here is an example that matches POST requests to /news with id: 1
 
-> { route: '/news'
->   payload {
->     id: 1
->   },
->   responseCode: 200,
->   responseBody: 'yay! it matches'
-> }
+> { route: '/news'  
+>   payload {  
+>     id: 1  
+>   },  
+>   responseCode: 200,  
+>   responseBody: 'yay! it matches'  
+> }  
 
 
 ##### Response can be a file. In this case, fake-server will respond with the output of that file.
