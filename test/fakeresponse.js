@@ -127,4 +127,44 @@ describe('FakeResponse model tests', function () {
             assert.ok(false,'should not throw exceptions on a controlled test environemnt');
         });
     });
+
+    /* POST request tests */
+    it('should use payload to match against for POST requests', function() {
+        model.add({
+            route: '/match/me',
+            payload: {
+                'id': 1
+            },
+            responseCode: 200,
+            responseBody: 'weba',
+        });
+        /*even though "uri"  is the same, we are only matching if payload contains id:1 */
+        var response = model.match('/match/me');
+        assert.equal(0, response);
+     });
+
+     it('should use payload to match against for POST requests', function() {
+        var obj = {};
+        model.add({
+            route: '/match/me',
+            payload: {
+                'id': 1
+            },
+            responseCode: 200,
+            responseBody: 'weba',
+        });
+        model.add({
+            route: '/match/me',
+            payload: {
+                'id': 2
+            },
+            responseCode: 403,
+            responseBody: 'buuu'
+        });
+        /*even though "uri"  is the same, we are only matching if payload contains id:1 */
+        var response = model.match('/match/me', { id: 1 });
+        assert.deepEqual(response.responseBody, 'weba');
+        assert.deepEqual(response.responseCode, 200);
+     });
+
 });

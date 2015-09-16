@@ -50,17 +50,15 @@ var FakeResponse = {
     },
 
     /* Filters all items that match the URL and then tries to check if there is a specific behavior for the Nth call on the same endpoint */
-    match: function (uri) {
+    match: function (uri, payload) {
         return FakeResponse._items.filter(function (item) {
             var matches = uri.match(new RegExp(item.route));
 
             if (matches !== null) {
                 item.numCalls += 1;
+                if(item.payload && !FakeResponse.matchPayload(item, payload)) return false; 
                 if (item.at) {
-                    if (item.numCalls === item.at) {
-                        return true;
-                    }
-                    return false;
+                    return (item.numCalls === item.at); 
                 }
                 return true;
             }
@@ -70,6 +68,16 @@ var FakeResponse = {
                 return match;
             }
         }, 0);
+    },
+
+    matchPayload: function(item, payload) {
+        if (typeof(payload) !== "object" || typeof(item.payload) !== "object") return false;
+        for (var ppty in item.payload) {
+            if (!item.payload.hasOwnProperty(ppty) || !payload.hasOwnProperty(ppty)) return false;
+            if (item.payload[ppty] !== payload[ppty]) return false;
+        }
+        return true;
+
     }
 };
 

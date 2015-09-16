@@ -43,7 +43,7 @@ var controller = {
             res.end();
         }
 
-        var bestMatch = controller.fakeResponse.match(req.url);
+        var bestMatch = controller.fakeResponse.match(req.url, req.body);
 
         if (bestMatch) {
             var headers = {
