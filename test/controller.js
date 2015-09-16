@@ -151,8 +151,6 @@ describe('Integration tests', function () {
 
         controller.add(req, res, function () {});
 
-        
-
         controller.match({
             url: '/delayed',
         }, res, next);
@@ -166,12 +164,11 @@ describe('Integration tests', function () {
         assert.isTrue(next.calledOnce);
 
         clock.restore();
-
         done();
     });
 
 
-    it('Should Default to header application/json', function (done) {
+    it('Should Default to header application/json', function () {
         var next = sinon.stub(),
 
             obj = {
@@ -184,7 +181,6 @@ describe('Integration tests', function () {
                     route: '/abc',
                 }
             },
-            
             res = {
                 send: sinon.stub(),
                 write: sinon.stub(),
@@ -202,7 +198,44 @@ describe('Integration tests', function () {
         assert.isTrue(res.writeHead.calledWithExactly(200, {'Content-Type': 'application/json', 'Content-Length': 2}));
         assert.isTrue(res.write.calledWithExactly('OK'));
         assert.isTrue(res.end.calledOnce);
+    });
 
-        done();
+    it('should work with POST requests', function() {
+        var next = sinon.stub(),
+            obj = {
+                route: '/abc',
+                payload: {
+                    'name': 'something',
+                    'id': 1
+                },
+                responseCode: 200,
+                responseBody: 'OK'
+            },
+            req = {
+                url: '/abc',
+                params: {
+                    route: '/abc',
+                },
+                body: {
+                    'id': 1,
+                    'name': 'something'
+                }
+            },
+            res = {
+                send: sinon.stub(),
+                write: sinon.stub(),
+                writeHead: sinon.stub(),
+                end: sinon.stub()
+            };
+
+        controller.fakeResponse.add(obj);
+
+        controller.match(req, res, next);
+
+        assert.isTrue(res.write.calledWithExactly('OK'));
+        assert.isTrue(res.end.calledOnce);
+
+
+
     });
 });
