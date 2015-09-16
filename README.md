@@ -70,6 +70,19 @@ This will match http://localhost:3012/news/007 as well as http://localhost:3012/
 > responseCode: 200,  
 > responseBody: 'whatever you want' }  
 
+##### Fake-server supports "POST" calls and uses payload for matching.
+
+NOTE: payload matching does not support RegEx yet. Here is an example that matches POST requests to /news with id: 1
+
+> { route: '/news'
+>   payload {
+>     id: 1
+>   },
+>   responseCode: 200,
+>   responseBody: 'yay! it matches'
+> }
+
+
 ##### Response can be a file. In this case, fake-server will respond with the output of that file.
 
 The following configuration example will return the output of ./mock_data/sample.json *(notice the parameter is called responseData instead of responseBody)*
@@ -110,9 +123,8 @@ To avoid the need to restart fake-server in order to clear the configuration, we
 
 
 ### Limitations
-- Fake-server matches only URI, it won't work with `POST` body data (although you can `POST` to a fake URI)
 - There are two reserved endpoints: POST '/add' and  `DELETE` '/flush'. These cannot be used by your application.
-- There is still no support for custom headers in response or for headers in general.  
+- There is still no support for request headers validation. All you can do is configure the response headers. 
 
 
 ### Get in touch:  
