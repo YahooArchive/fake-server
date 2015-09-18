@@ -144,7 +144,6 @@ describe('FakeResponse model tests', function () {
      });
 
      it('should use payload to match against for POST requests', function() {
-        var obj = {};
         model.add({
             route: '/match/me',
             payload: {
@@ -165,6 +164,37 @@ describe('FakeResponse model tests', function () {
         var response = model.match('/match/me', { id: 1 });
         assert.deepEqual(response.responseBody, 'weba');
         assert.deepEqual(response.responseCode, 200);
+     });
+
+     it('should match POST request payloads using explicit regular expressions', function() {
+        model.add({
+            route: '/match/me',
+            payload: {
+                'id': "[\\d+]"
+            },
+            responseCode: 200,
+            responseBody: 'Regex success',
+        });
+        var response = model.match('/match/me', { id: 9273892 });
+        assert.deepEqual(response.responseBody, 'Regex success');
+        assert.deepEqual(response.responseCode, 200);
+
+        model.add({
+            route: '/match/me',
+            payload: {
+                'a': "[\\d+]",
+                'b': "^(foo|bar|baz)$"
+            },
+            responseCode: 200,
+            responseBody: 'Regex success',
+        });
+        var response = model.match('/match/me', { a: 2, b:"baz" });
+        assert.deepEqual(response.responseBody, 'Regex success');
+        assert.deepEqual(response.responseCode, 200);
+
+        // Non-matching payload (bazz) should fail
+        response = model.match('/match/me', { a: 2, foo:"bazz" });
+        assert.equal(0, response);
      });
 
 
@@ -209,7 +239,7 @@ describe('FakeResponse model tests', function () {
          assert.deepEqual(response.responseBody, 'Space success');
      });
 
-     it('should match query params using regular expressions', function() {
+     it('should match query params using explicit regular expressions', function() {
          // 1. Simple regex
          model.add({
              route: '/match/me',
@@ -249,5 +279,4 @@ describe('FakeResponse model tests', function () {
          assert.deepEqual(response.responseCode, 200);
          assert.deepEqual(response.responseBody, 'Regex success');
      });
-
 });

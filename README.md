@@ -70,19 +70,18 @@ This will match http://localhost:3012/news/007 as well as http://localhost:3012/
 > responseCode: 200,  
 > responseBody: 'whatever you want' }  
 
-##### Fake-server supports "POST" calls and uses payload for matching.
-
-NOTE: payload matching does not support RegEx yet. Here is an example that matches POST requests to /news with id: 1
+##### Fake-server supports "POST" calls and uses payload for matching. Regexs are supported for payload matching:
 
 > { route: '/news'  
 >   payload: {  
->     id: 1  
+>     id: [\\d+],
+>     month: "february"
 >   },  
 >   responseCode: 200,  
 >   responseBody: 'yay! it matches'  
 > }  
 
-##### Support for query string matching. You can optionally match against a RegEx.
+##### Support for query string matching. All query params are evaluated as a RegEx.
 
 > { route: '/news',
 >   queryParams: {

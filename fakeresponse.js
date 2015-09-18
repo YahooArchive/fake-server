@@ -59,11 +59,9 @@ var FakeResponse = {
 
             if (doPathsMatch !== null) {
                 item.numCalls += 1;
-                if(item.queryParams && !FakeResponse.matchQueryParams(item, uri.query)) return false;
-                if(item.payload && !FakeResponse.matchPayload(item, payload)) return false; 
-                if (item.at) {
-                    return (item.numCalls === item.at); 
-                }
+                if(item.queryParams && !FakeResponse.matchRegex(item.queryParams, uri.query)) return false;
+                if(item.payload && !FakeResponse.matchRegex(item.payload, payload)) return false; 
+                if (item.at) return (item.numCalls === item.at); 
                 return true;
             }
             return false;
@@ -74,29 +72,21 @@ var FakeResponse = {
         }, 0);
     },
 
-    matchPayload: function(item, payload) {
-        if (typeof(payload) !== "object" || typeof(item.payload) !== "object") return false;
-        for (var ppty in item.payload) {
-            if (!item.payload.hasOwnProperty(ppty) || !payload.hasOwnProperty(ppty)) return false;
-            if (item.payload[ppty] !== payload[ppty]) return false;
-        }
-        return true;
-    },
+    /*
+     * Match objB's values against regular expressions stored in objA. Key equality determines values to test.
+     * @param {objA} An object whose string values represent regular expressions
+     * @param {objB} An object whose values will be matched against objA's values
+     * @return {boolean} If objB matches all regular expressions
+     */
+    matchRegex: function(objA, objB) {
+        if (typeof(objB) !== "object" || typeof(objA) !== "object") return false;
 
-    matchQueryParams: function(item, queryParams) {
-        if (typeof(queryParams) !== "object" || typeof(item.queryParams) !== "object") return false;
+        for (var ppty in objA) {
+            if (!objA.hasOwnProperty(ppty) || !objB.hasOwnProperty(ppty)) return false;
 
-        for (var ppty in item.queryParams) {
-            if (!item.queryParams.hasOwnProperty(ppty) || !queryParams.hasOwnProperty(ppty)) return false;
-
-            if (typeof(item.queryParams[ppty]) === 'string' ) {
-                // Evalute regex match
-                var queryMatches = queryParams[ppty].match(new RegExp(item.queryParams[ppty]));
-                if (queryMatches == null) return false;
-            } else {
-                // Or evalute exact property match
-                if (item.queryParams[ppty] != queryParams[ppty]) return false;
-            }
+            // Evalute regex match
+            var matches = String(objB[ppty]).match(new RegExp(objA[ppty]));
+            if (matches == null) return false;
         }
         return true;
     }
