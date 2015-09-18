@@ -11,6 +11,7 @@ var fs = require('fs');
 var glob = require('glob');
 var path = require('path');
 var when = require('when');
+var url = require('url');
 
 var FakeResponse = {
     _items: [],
@@ -51,11 +52,14 @@ var FakeResponse = {
 
     /* Filters all items that match the URL and then tries to check if there is a specific behavior for the Nth call on the same endpoint */
     match: function (uri, payload) {
-        return FakeResponse._items.filter(function (item) {
-            var matches = uri.match(new RegExp(item.route));
+        uri = url.parse(uri, true);
 
-            if (matches !== null) {
+        return FakeResponse._items.filter(function (item) {
+            var doPathsMatch = uri.pathname.match(new RegExp(item.route));
+
+            if (doPathsMatch !== null) {
                 item.numCalls += 1;
+                if(item.queryParams && !FakeResponse.matchQueryParams(item, uri.query)) return false;
                 if(item.payload && !FakeResponse.matchPayload(item, payload)) return false; 
                 if (item.at) {
                     return (item.numCalls === item.at); 
@@ -77,7 +81,24 @@ var FakeResponse = {
             if (item.payload[ppty] !== payload[ppty]) return false;
         }
         return true;
+    },
 
+    matchQueryParams: function(item, queryParams) {
+        if (typeof(queryParams) !== "object" || typeof(item.queryParams) !== "object") return false;
+
+        for (var ppty in item.queryParams) {
+            if (!item.queryParams.hasOwnProperty(ppty) || !queryParams.hasOwnProperty(ppty)) return false;
+
+            if (typeof(item.queryParams[ppty]) === 'string' ) {
+                // Evalute regex match
+                var queryMatches = queryParams[ppty].match(new RegExp(item.queryParams[ppty]));
+                if (queryMatches == null) return false;
+            } else {
+                // Or evalute exact property match
+                if (item.queryParams[ppty] != queryParams[ppty]) return false;
+            }
+        }
+        return true;
     }
 };
 

@@ -82,6 +82,17 @@ NOTE: payload matching does not support RegEx yet. Here is an example that match
 >   responseBody: 'yay! it matches'  
 > }  
 
+##### Support for query string matching. You can optionally match against a RegEx.
+
+> { route: '/news',
+>   queryParams: {
+>       id: "[\\d+]",
+>       location: "Hawaii"
+>   }  
+>   responseCode: 200,  
+>   responseBody: 'Regex matching rocks'  
+> }  
+
 
 ##### Response can be a file. In this case, fake-server will respond with the output of that file.
 

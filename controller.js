@@ -24,6 +24,7 @@ var controller = {
             delay: req.params.delay,
             at: req.params.at,
             route: req.params.route,
+            queryParams: req.params.queryParams,
             responseCode: req.params.responseCode,
             responseBody: decodeURIComponent(req.params.responseBody.replace(/&quot;/g, '"')),
         };
