@@ -144,7 +144,6 @@ describe('FakeResponse model tests', function () {
      });
 
      it('should use payload to match against for POST requests', function() {
-        var obj = {};
         model.add({
             route: '/match/me',
             payload: {
@@ -167,4 +166,117 @@ describe('FakeResponse model tests', function () {
         assert.deepEqual(response.responseCode, 200);
      });
 
+     it('should match POST request payloads using explicit regular expressions', function() {
+        model.add({
+            route: '/match/me',
+            payload: {
+                'id': "[\\d+]"
+            },
+            responseCode: 200,
+            responseBody: 'Regex success',
+        });
+        var response = model.match('/match/me', { id: 9273892 });
+        assert.deepEqual(response.responseBody, 'Regex success');
+        assert.deepEqual(response.responseCode, 200);
+
+        model.add({
+            route: '/match/me',
+            payload: {
+                'a': "[\\d+]",
+                'b': "^(foo|bar|baz)$"
+            },
+            responseCode: 200,
+            responseBody: 'Regex success',
+        });
+        var response = model.match('/match/me', { a: 2, b:"baz" });
+        assert.deepEqual(response.responseBody, 'Regex success');
+        assert.deepEqual(response.responseCode, 200);
+
+        // Non-matching payload (bazz) should fail
+        response = model.match('/match/me', { a: 2, foo:"bazz" });
+        assert.equal(0, response);
+     });
+
+
+     /* Query params test */
+     it('should match query params', function() {
+         model.add({
+             route: '/match/me',
+             queryParams: {
+                a: 1,
+                b: 2
+             },
+             responseCode: 200,
+             responseBody: 'Query param success'
+         });
+
+         var response = model.match('/match/me?a=1&b=2');
+         assert.deepEqual(response.responseCode, 200);
+         assert.deepEqual(response.responseBody, 'Query param success');
+
+         // Varying order of query params shouldn't affect matching
+         response = model.match('/match/me?a=1&b=2');
+         assert.deepEqual(response.responseCode, 200);
+         assert.deepEqual(response.responseBody, 'Query param success');
+
+         model.add({
+             route: '/match/me',
+             queryParams: {
+                name: "Fabio Hirata"
+             },
+             responseCode: 200,
+             responseBody: 'Space success'
+         });
+
+         // query params with spaces should work
+         response = model.match('/match/me?name=Fabio Hirata');
+         assert.deepEqual(response.responseCode, 200);
+         assert.deepEqual(response.responseBody, 'Space success');
+
+         // ...even if encoded with +
+         response = model.match('/match/me?name=Fabio+Hirata');
+         assert.deepEqual(response.responseCode, 200);
+         assert.deepEqual(response.responseBody, 'Space success');
+     });
+
+     it('should match query params using explicit regular expressions', function() {
+         // 1. Simple regex
+         model.add({
+             route: '/match/me',
+             queryParams: {
+                a: "[0-9]"
+             },
+             responseCode: 200,
+             responseBody: 'Regex success'
+         });
+
+         var response = model.match('/match/me?a=0');
+         assert.deepEqual(response.responseCode, 200);
+         assert.deepEqual(response.responseBody, 'Regex success');
+
+         response = model.match('/match/me?a=9');
+         assert.deepEqual(response.responseCode, 200);
+         assert.deepEqual(response.responseBody, 'Regex success');
+
+         response = model.match('/match/me?a=1234567890');
+         assert.deepEqual(response.responseCode, 200);
+         assert.deepEqual(response.responseBody, 'Regex success');
+
+         // 2. Various other regex's
+         model.add({
+             route: '/match/me',
+             queryParams: {
+                b: "[0-9]",
+                c: "[\\d+]",
+                d: 1,
+                e: "^(foo|bar)$"
+             },
+             responseCode: 200,
+             responseBody: 'Regex success'
+         });
+
+         var response = model.match('/match/me?e=bar&b=12345&c=6789&d=1');
+         assert.deepEqual(response.responseCode, 200);
+         assert.deepEqual(response.responseBody, 'Regex success');
+     });
 });

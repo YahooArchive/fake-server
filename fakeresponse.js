@@ -11,6 +11,7 @@ var fs = require('fs');
 var glob = require('glob');
 var path = require('path');
 var when = require('when');
+var url = require('url');
 
 var FakeResponse = {
     _items: [],
@@ -51,15 +52,16 @@ var FakeResponse = {
 
     /* Filters all items that match the URL and then tries to check if there is a specific behavior for the Nth call on the same endpoint */
     match: function (uri, payload) {
-        return FakeResponse._items.filter(function (item) {
-            var matches = uri.match(new RegExp(item.route));
+        uri = url.parse(uri, true);
 
-            if (matches !== null) {
+        return FakeResponse._items.filter(function (item) {
+            var doPathsMatch = uri.pathname.match(new RegExp(item.route));
+
+            if (doPathsMatch !== null) {
                 item.numCalls += 1;
-                if(item.payload && !FakeResponse.matchPayload(item, payload)) return false; 
-                if (item.at) {
-                    return (item.numCalls === item.at); 
-                }
+                if(item.queryParams && !FakeResponse.matchRegex(item.queryParams, uri.query)) return false;
+                if(item.payload && !FakeResponse.matchRegex(item.payload, payload)) return false; 
+                if (item.at) return (item.numCalls === item.at); 
                 return true;
             }
             return false;
@@ -70,14 +72,23 @@ var FakeResponse = {
         }, 0);
     },
 
-    matchPayload: function(item, payload) {
-        if (typeof(payload) !== "object" || typeof(item.payload) !== "object") return false;
-        for (var ppty in item.payload) {
-            if (!item.payload.hasOwnProperty(ppty) || !payload.hasOwnProperty(ppty)) return false;
-            if (item.payload[ppty] !== payload[ppty]) return false;
+    /*
+     * Match objB's values against regular expressions stored in objA. Key equality determines values to test.
+     * @param {objA} An object whose string values represent regular expressions
+     * @param {objB} An object whose values will be matched against objA's values
+     * @return {boolean} If objB matches all regular expressions
+     */
+    matchRegex: function(objA, objB) {
+        if (typeof(objB) !== "object" || typeof(objA) !== "object") return false;
+
+        for (var ppty in objA) {
+            if (!objA.hasOwnProperty(ppty) || !objB.hasOwnProperty(ppty)) return false;
+
+            // Evalute regex match
+            var matches = String(objB[ppty]).match(new RegExp(objA[ppty]));
+            if (matches == null) return false;
         }
         return true;
-
     }
 };
 
