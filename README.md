@@ -92,6 +92,16 @@ This will match http://localhost:3012/news/007 as well as http://localhost:3012/
 >   responseBody: 'Regex matching rocks'  
 > }  
 
+##### ... can also use the request Headers. So you can check if specific cookies are present, for instance
+
+> { route: '/secure',    
+>   requiredHeaders: {    
+>       X-Auth: "secret",    
+>   },   
+>   responseCode: 200,   
+>   responseBody: 'header is there'   
+> }   
+
 
 ##### Response can be a file. In this case, fake-server will respond with the output of that file.
 

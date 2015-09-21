@@ -114,7 +114,7 @@ describe('FakeResponse model tests', function () {
     it('should allow user to load pre-configured routes from ./default_routes/', function (done) {
         // TODO: mock "glob" with rewire.
         model.preload().then(function () {
-            assert.equal(2, model._items.length);
+            assert.equal(3, model._items.length);
             var firstRoute = model.getAll()[0];
             assert.equal('/mock/0', firstRoute.route)
             assert.equal(200, firstRoute.responseCode);

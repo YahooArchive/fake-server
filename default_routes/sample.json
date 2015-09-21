@@ -9,5 +9,12 @@
         "route": "/mock/1",
         "responseCode":200,
         "responseData": "./mock_data/sample.json"
+    },
+    {
+        "route": "/mock/3",
+        "requiredHeaders": {
+            "Cookie": "username=.*"
+        },
+        "responseBody": "headers match :-)"
     }]
 }

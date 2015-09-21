@@ -45,7 +45,7 @@ var controller = {
             res.end();
         }
 
-        var bestMatch = controller.fakeResponse.match(req.url, req.body);
+        var bestMatch = controller.fakeResponse.match(req.url, req.body, req.headers);
 
         if (bestMatch) {
             var headers = {
