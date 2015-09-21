@@ -51,7 +51,7 @@ var FakeResponse = {
     },
 
     /* Filters all items that match the URL and then tries to check if there is a specific behavior for the Nth call on the same endpoint */
-    match: function (uri, payload) {
+    match: function (uri, payload, headers) {
         uri = url.parse(uri, true);
 
         return FakeResponse._items.filter(function (item) {
@@ -61,6 +61,7 @@ var FakeResponse = {
                 item.numCalls += 1;
                 if(item.queryParams && !FakeResponse.matchRegex(item.queryParams, uri.query)) return false;
                 if(item.payload && !FakeResponse.matchRegex(item.payload, payload)) return false; 
+                if(item.requiredHeaders && !FakeResponse.matchRegex(item.requiredHeaders, headers)) return false;
                 if (item.at) return (item.numCalls === item.at); 
                 return true;
             }

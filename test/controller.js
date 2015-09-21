@@ -234,8 +234,71 @@ describe('Integration tests', function () {
 
         assert.isTrue(res.write.calledWithExactly('OK'));
         assert.isTrue(res.end.calledOnce);
+    });
 
+    it('should allow header matching (no-match)', function() {
+        var config = {
+            route: '/x',
+            requiredHeaders: {
+                'Cookie': 'A=.*'
+            },
+            responseCode: 123,
+            responseBody: "BLAH"
+        };
 
+        var invalid_req = {
+            url: '/x',
+            params: {
+                route: '/x'
+            }
+        };
+
+        var res = { 
+            send: sinon.stub(),
+            write: sinon.stub(),
+            writeHead: sinon.stub(),
+            end: sinon.stub()
+        };
+
+        controller.fakeResponse.add(config);
+        controller.match(invalid_req, res, sinon.stub());
+
+        assert.isTrue(res.send.calledWith(404, 'no match!'));
+    });
+
+    it('should allow header matching', function () {
+        var config = {
+            route: '/x',
+            requiredHeaders: {
+                'Cookie': 'A=.*'
+            },
+            responseCode: 123,
+            responseBody: "BLAH"
+        };
+
+        var req = {
+            url: '/x',
+            headers: {
+                'Some': 'thing',
+                'Cookie': 'A=adsfadfadsf'
+            },
+            params: {
+                route: '/x'
+            }
+        };
+
+        var res = { 
+            send: sinon.stub(),
+            write: sinon.stub(),
+            writeHead: sinon.stub(),
+            end: sinon.stub()
+        };
+
+        controller.fakeResponse.add(config);
+        controller.match(req, res, sinon.stub());
+
+        assert.isTrue(res.write.calledWith('BLAH'));
+        assert.isTrue(res.writeHead.calledWith(123));
 
     });
 });
