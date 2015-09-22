@@ -50,6 +50,27 @@ var FakeResponse = {
         FakeResponse._items = [];
     },
 
+    /*Lexicographic comparison based on: (at, num params matched, num headers matched)*/
+    compareMatches: function(matchA, matchB) {
+        /*First rank on 'at' match*/
+        if (!matchA.hasOwnProperty('at') && matchB.hasOwnProperty('at')) {
+            return 1;
+        }
+        if (matchA.hasOwnProperty('at') && !matchB.hasOwnProperty('at')) {
+            return -1;
+        }
+
+        /*Second rank on quality of 'params' match*/
+        var queryCmp = Object.keys(matchB.queryParams || {}).length - Object.keys(matchA.queryParams || {}).length;
+        if (queryCmp !== 0) {
+            return queryCmp;
+        }
+
+        /*If still tied, rank on quality of 'headers' match*/
+        return Object.keys(matchB.requiredHeaders || {}).length - Object.keys(matchA.requiredHeaders || {}).length;
+    },
+
+
     /* Filters all items that match the URL and then tries to check if there is a specific behavior for the Nth call on the same endpoint */
     match: function (uri, payload, headers) {
         uri = url.parse(uri, true);
@@ -66,11 +87,7 @@ var FakeResponse = {
                 return true;
             }
             return false;
-        }).reduce(function (previous, match) {
-            if (match.at || previous === 0) {
-                return match;
-            }
-        }, 0);
+        }).sort(FakeResponse.compareMatches)[0] || null;
     },
 
     /*
@@ -87,7 +104,7 @@ var FakeResponse = {
 
             // Evalute regex match
             var matches = String(objB[ppty]).match(new RegExp(objA[ppty]));
-            if (matches == null) return false;
+            if (matches === null) return false;
         }
         return true;
     }

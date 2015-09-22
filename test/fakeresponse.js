@@ -17,6 +17,11 @@ describe('FakeResponse model tests', function () {
         model._items = [];
     });
 
+    it('should return null if no routes have been added', function() {
+        var response = model.match('/match/me');
+        assert.equal(null, response);
+     });
+
     it('should add new items to the list of fake responses', function () {
         assert.equal(0, model.getAll().length, 'should start empty');
         model.add({
@@ -116,10 +121,10 @@ describe('FakeResponse model tests', function () {
         model.preload().then(function () {
             assert.equal(3, model._items.length);
             var firstRoute = model.getAll()[0];
-            assert.equal('/mock/0', firstRoute.route)
+            assert.equal('/mock/0', firstRoute.route);
             assert.equal(200, firstRoute.responseCode);
             var secondRoute = model.getAll()[1];
-            assert.equal('/mock/1', secondRoute.route)
+            assert.equal('/mock/1', secondRoute.route);
             assert.equal(200, secondRoute.responseCode);
             done();
         }).catch(function(e) {
@@ -140,7 +145,7 @@ describe('FakeResponse model tests', function () {
         });
         /*even though "uri"  is the same, we are only matching if payload contains id:1 */
         var response = model.match('/match/me');
-        assert.equal(0, response);
+        assert.equal(null, response);
      });
 
      it('should use payload to match against for POST requests', function() {
@@ -188,13 +193,13 @@ describe('FakeResponse model tests', function () {
             responseCode: 200,
             responseBody: 'Regex success',
         });
-        var response = model.match('/match/me', { a: 2, b:"baz" });
+        response = model.match('/match/me', { a: 2, b:"baz" });
         assert.deepEqual(response.responseBody, 'Regex success');
         assert.deepEqual(response.responseCode, 200);
 
         // Non-matching payload (bazz) should fail
         response = model.match('/match/me', { a: 2, foo:"bazz" });
-        assert.equal(0, response);
+        assert.equal(null, response);
      });
 
 
@@ -275,8 +280,71 @@ describe('FakeResponse model tests', function () {
              responseBody: 'Regex success'
          });
 
-         var response = model.match('/match/me?e=bar&b=12345&c=6789&d=1');
+         response = model.match('/match/me?e=bar&b=12345&c=6789&d=1');
          assert.deepEqual(response.responseCode, 200);
          assert.deepEqual(response.responseBody, 'Regex success');
      });
+
+     it('should use number of query params matched to break ties (not order added)', function() {
+         var route1 = {
+             route: '/match/me',
+             queryParams: {
+                 a: '[0-9]+'
+             },
+             responseCode: 200
+         };
+         var route2 = {
+             route: '/match/me',
+             responseCode: 400
+         };
+         model.add(route1);
+         model.add(route2);
+
+         var response = model.match('/match/me?a=1234');
+         assert.equal(response.responseCode, 200);
+         response = model.match('/match/me');
+         assert.equal(response.responseCode, 400);
+
+         model.flush();
+         model.add(route2);
+         model.add(route1);
+
+         response = model.match('/match/me?a=1234');
+         assert.equal(response.responseCode, 200);
+         response = model.match('/match/me');
+         assert.equal(response.responseCode, 400);
+     });
+
+     it('should use number of headers matched to break ties, if num query params matched is the same', function() {
+         var route1 = {
+             route: '/match/me',
+             at: 1,
+             queryParams: {
+                 a: '[0-9]+'
+             },
+             responseCode: 200,
+             requiredHeaders: {
+                 Cookie: 'Y=[a-z]+'
+             }
+         };
+         var route2 = {
+             route: '/match/me',
+             at: 1,
+             queryParams: {
+                 a: '[0-9]+'
+             },
+             responseCode: 400
+         };
+         model.add(route1);
+         model.add(route2);
+         var response = model.match('/match/me?a=1234', null, { Cookie: 'Y=abcd' });
+         assert.equal(response.responseCode, 200);
+
+         model.flush();
+         model.add(route1);
+         model.add(route2);
+
+         response = model.match('/match/me?a=1234');
+         assert.equal(response.responseCode, 400);
+    });
 });
