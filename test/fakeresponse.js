@@ -134,7 +134,7 @@ describe('FakeResponse model tests', function () {
     });
 
     /* POST request tests */
-    it('should use payload to match against for POST requests', function() {
+    it('should not match route if payload doesn\'t match', function() {
         model.add({
             route: '/match/me',
             payload: {
@@ -171,6 +171,46 @@ describe('FakeResponse model tests', function () {
         assert.deepEqual(response.responseCode, 200);
      });
 
+     it('should support paths in payload', function() {
+        model.add({
+            route: '/match/me',
+            payload: {
+                'outer[0].inner': 1
+            },
+            responseCode: 200,
+            responseBody: 'weba'
+        });
+        model.add({
+            route: '/match/me',
+            payload: {
+                'id': 2
+            },
+            responseCode: 403,
+            responseBody: 'buuu'
+        });
+
+        var response = model.match('/match/me', { outer: [{inner: 1 }]});
+        assert.deepEqual(response.responseBody, 'weba');
+        assert.deepEqual(response.responseCode, 200);
+     });
+
+     it('paths should not break query param matching', function() {
+        model.add({
+            route: '/match/me',
+            queryParams: {
+                'outer[0].inner': 1
+            },
+            responseCode: 200,
+            responseBody: 'weba'
+        });
+
+        var response = model.match('/match/me?outer[0].inner=1');
+        assert.deepEqual(response.responseBody, 'weba');
+        assert.deepEqual(response.responseCode, 200);
+
+        response = model.match('/match/me?param=1');
+        assert.deepEqual(response, null);
+     });
      it('should match POST request payloads using explicit regular expressions', function() {
         model.add({
             route: '/match/me',

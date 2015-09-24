@@ -12,6 +12,7 @@ var glob = require('glob');
 var path = require('path');
 var when = require('when');
 var url = require('url');
+var _ = require('lodash');
 
 var FakeResponse = {
     _items: [],
@@ -99,14 +100,14 @@ var FakeResponse = {
     matchRegex: function(objA, objB) {
         if (typeof(objB) !== "object" || typeof(objA) !== "object") return false;
 
-        for (var ppty in objA) {
-            if (!objA.hasOwnProperty(ppty) || !objB.hasOwnProperty(ppty)) return false;
+        return Object.keys(objA).every(function(path) {
+            var value = _.get(objB, path);
+            if (!value) return false;
 
             // Evalute regex match
-            var matches = String(objB[ppty]).match(new RegExp(objA[ppty]));
-            if (matches === null) return false;
-        }
-        return true;
+            var matches = String(value).match(new RegExp(objA[path]));
+            return matches;
+        });
     }
 };
 

@@ -26,6 +26,7 @@
   },
   "dependencies": {
     "glob": "~5.0.14",
+    "lodash": "~3.10.1",
     "merge": "^1.2.0",
     "restify": "=2.6.2",
     "rewire": "~2.3.4",
