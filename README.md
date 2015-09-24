@@ -70,11 +70,12 @@ This will match http://localhost:3012/news/007 as well as http://localhost:3012/
 > responseCode: 200,  
 > responseBody: 'whatever you want' }  
 
-##### Fake-server supports "POST" calls and uses payload for matching. Regexs are supported for payload matching:
+##### Fake-server supports "POST" calls and uses payload for matching. Regexs are supported for payload matching, and paths can be used to specify inner properties of JSON payloads:
 
 > { route: '/news'  
 >   payload: {  
 >     id: [\\d+],
+>     requests[1].user.login: 'jdoe',
 >     month: "february"
 >   },  
 >   responseCode: 200,  
