@@ -325,33 +325,39 @@ describe('FakeResponse model tests', function () {
          assert.deepEqual(response.responseBody, 'Regex success');
      });
 
-     it('should use number of query params matched to break ties (not order added)', function() {
+     it('should use number of params (query and payload) matched to break ties (not order added)', function() {
          var route1 = {
              route: '/match/me',
              queryParams: {
                  a: '[0-9]+'
              },
+             payload: {
+                 b: '^[a-z]+$'
+             },
              responseCode: 200
          };
          var route2 = {
              route: '/match/me',
+             queryParams: {
+                 a: '[0-9]+'
+             },
              responseCode: 400
          };
          model.add(route1);
          model.add(route2);
 
-         var response = model.match('/match/me?a=1234');
+         var response = model.match('/match/me?a=1234', {b: 'abcd'});
          assert.equal(response.responseCode, 200);
-         response = model.match('/match/me');
+         response = model.match('/match/me?a=1234', {b: 'abc123'});
          assert.equal(response.responseCode, 400);
 
          model.flush();
          model.add(route2);
          model.add(route1);
 
-         response = model.match('/match/me?a=1234');
+         response = model.match('/match/me?a=1234', {b: 'abcd'});
          assert.equal(response.responseCode, 200);
-         response = model.match('/match/me');
+         response = model.match('/match/me?a=1234', {b: 'abc123'});
          assert.equal(response.responseCode, 400);
      });
 
