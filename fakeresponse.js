@@ -12,6 +12,7 @@ var glob = require('glob');
 var path = require('path');
 var when = require('when');
 var url = require('url');
+var _ = require('lodash');
 
 var FakeResponse = {
     _items: [],
@@ -50,7 +51,7 @@ var FakeResponse = {
         FakeResponse._items = [];
     },
 
-    /*Lexicographic comparison based on: (at, num params matched, num headers matched)*/
+    /*Lexicographic comparison based on: (at, num query + payload params matched, num headers matched)*/
     compareMatches: function(matchA, matchB) {
         /*First rank on 'at' match*/
         if (!matchA.hasOwnProperty('at') && matchB.hasOwnProperty('at')) {
@@ -61,7 +62,11 @@ var FakeResponse = {
         }
 
         /*Second rank on quality of 'params' match*/
-        var queryCmp = Object.keys(matchB.queryParams || {}).length - Object.keys(matchA.queryParams || {}).length;
+        var numParamsMatchedB = Object.keys(matchB.queryParams || {}).length +
+            Object.keys(matchB.payload || {}).length;
+        var numParamsMatchedA = Object.keys(matchA.queryParams || {}).length +
+            Object.keys(matchA.payload || {}).length;
+        var queryCmp = numParamsMatchedB - numParamsMatchedA;
         if (queryCmp !== 0) {
             return queryCmp;
         }
@@ -81,9 +86,9 @@ var FakeResponse = {
             if (doPathsMatch !== null) {
                 item.numCalls += 1;
                 if(item.queryParams && !FakeResponse.matchRegex(item.queryParams, uri.query)) return false;
-                if(item.payload && !FakeResponse.matchRegex(item.payload, payload)) return false; 
+                if(item.payload && !FakeResponse.matchRegex(item.payload, payload)) return false;
                 if(item.requiredHeaders && !FakeResponse.matchRegex(item.requiredHeaders, headers)) return false;
-                if (item.at) return (item.numCalls === item.at); 
+                if (item.at) return (item.numCalls === item.at);
                 return true;
             }
             return false;
@@ -99,14 +104,14 @@ var FakeResponse = {
     matchRegex: function(objA, objB) {
         if (typeof(objB) !== "object" || typeof(objA) !== "object") return false;
 
-        for (var ppty in objA) {
-            if (!objA.hasOwnProperty(ppty) || !objB.hasOwnProperty(ppty)) return false;
+        return Object.keys(objA).every(function(path) {
+            var value = _.get(objB, path);
+            if (!value) return false;
 
             // Evalute regex match
-            var matches = String(objB[ppty]).match(new RegExp(objA[ppty]));
-            if (matches === null) return false;
-        }
-        return true;
+            var matches = String(value).match(new RegExp(objA[path]));
+            return matches;
+        });
     }
 };
 
