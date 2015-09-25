@@ -145,10 +145,3 @@ To avoid the need to restart fake-server in order to clear the configuration, we
 
 ### Limitations
 - There are two reserved endpoints: POST '/add' and  `DELETE` '/flush'. These cannot be used by your application.
-- There is still no support for request headers validation. All you can do is configure the response headers. 
-
-
-### Get in touch:  
-
-* bigo (matheus@yahoo-inc.com)  
-* julio (julionn@yahoo-inc.com)  
