@@ -88,6 +88,19 @@ describe('FakeResponse model tests', function () {
         assert.deepEqual(response, obj);
     });
 
+    it('should anchor the route regexp to prevente ambiguity in routes', function() {
+        var obj = {
+            route: '/bar',
+            responseCode: 200,
+            responseBody: "match"
+        };
+
+        model.add(obj);
+
+        var response = model.match('/foo/bar');
+        assert.equal(null, response);
+    });
+
     it('should change behavior based on the AT property of the item', function () {
         model.add({
             route: '/i/don/t/want/this',
