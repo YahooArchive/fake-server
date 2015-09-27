@@ -81,7 +81,7 @@ var FakeResponse = {
         uri = url.parse(uri, true);
 
         return FakeResponse._items.filter(function (item) {
-            var doPathsMatch = uri.pathname.match(new RegExp(item.route));
+            var doPathsMatch = uri.pathname.match(new RegExp(item.route.indexOf('^') === 0 ? item.route : '^'+item.route));
 
             if (doPathsMatch !== null) {
                 item.numCalls += 1;
