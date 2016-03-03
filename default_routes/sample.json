@@ -16,5 +16,11 @@
             "Cookie": "username=.*"
         },
         "responseBody": "headers match :-)"
-    }]
+    },
+    {
+        "route": "/README",
+        "responseCode":200,
+        "responseBody": "./READEME.md"
+    }
+    ]
 }
