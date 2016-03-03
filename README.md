@@ -49,8 +49,8 @@ curl http://192.168.6.74:3012/add -X POST -H "Content-Type:application/json" -H 
 ```
 
 now, in your browser you can see the results:  
-http://192.168.6.74:3012/foo  
-http://192.168.6.74:3012/test  
+http://192.168.6.74:3012/{TUPROYECTO}/foo  
+http://192.168.6.74:3012/{TUPROYECTO}/test  
 
 
 ### What else can fake-server do?
