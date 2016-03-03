@@ -27,7 +27,7 @@ Let's say you want "/{TUPROYECTO}/test"  to always return "hello" and "/{TUPROYE
 All you have to do is `POST` to http://192.168.6.74:3012/add/ the following data:
 
 Configure /test by posting:
-> { route: '{TUPROYECTO}/test',  
+> { route: '/{TUPROYECTO}/test',  
 > responseCode: 200,  
 > responseBody: "hello" }  
 
@@ -38,7 +38,7 @@ curl http://192.168.6.74:3012/add -X POST -H "Content-Type:application/json" -H 
 ```
 
 now let's configure our 404 example by sending this to the server:
-> { route: '/foo',  
+> { route: '/{TUPROYECTO}/foo',  
 > responseCode: 404,  
 > responseBody: "Not found" }  
 
@@ -103,7 +103,7 @@ This will match http://192.168.6.74:3012/{TUPROYECTO}/news/007 as well as http:/
 
 The following configuration example will return the output of ./mock_data/sample.json *(notice the parameter is called responseData instead of responseBody)*
 
-> { route: '/',  
+> { route: '/{TUPROYECTO}/',  
 > responseCode: 200,  
 > responseData: './mock_data/sample.json' }  
 
