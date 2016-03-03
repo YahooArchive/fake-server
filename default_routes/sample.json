@@ -18,9 +18,9 @@
         "responseBody": "headers match :-)"
     },
     {
-        "route": "/README",
+        "route": "/HOWTO",
         "responseCode":200,
-        "responseBody": "./READEME.md"
+        "responseBody": "./mock_data/HOWTO.json"
     }
     ]
 }
