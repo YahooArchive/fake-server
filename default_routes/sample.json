@@ -20,7 +20,7 @@
     {
         "route": "/HOWTO",
         "responseCode":200,
-        "responseData": "./mock_data/HOWTO.json"
+        "responseData": "./README.md"
     }
     ]
 }
