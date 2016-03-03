@@ -20,7 +20,7 @@
     {
         "route": "/HOWTO",
         "responseCode":200,
-        "responseBody": "./mock_data/HOWTO.json"
+        "responseData": "./mock_data/HOWTO.json"
     }
     ]
 }
