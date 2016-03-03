@@ -34,7 +34,7 @@ Configure /test by posting:
 one of the many ways to do this is using cURL:
 ```
 curl http://192.168.6.74:3012/add -X POST -H "Content-Type:application/json" -H "Accept:application/json"  \ 
- -d '{"route":"/test","responseCode":200,"responseBody":"hello"}' 
+ -d '{"route":"/{TUPROYECTO}/test","responseCode":200,"responseBody":"hello"}' 
 ```
 
 now let's configure our 404 example by sending this to the server:
@@ -103,9 +103,12 @@ This will match http://192.168.6.74:3012/{TUPROYECTO}/news/007 as well as http:/
 
 The following configuration example will return the output of ./mock_data/sample.json *(notice the parameter is called responseData instead of responseBody)*
 
+Para esto, teneis que poneros en contacto conmigo --> crodriguez
+
 > { route: '/{TUPROYECTO}/',  
 > responseCode: 200,  
 > responseData: './mock_data/sample.json' }  
+
 
 
 ##### Same endpoint can have different responses 
