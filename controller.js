@@ -35,6 +35,13 @@ var controller = {
         res.send(200, 'OK');
         next();
     },
+    
+    getAll: function (req, res, next) {
+        var obj = controller.fakeResponse.getAll(obj);
+
+        res.send(200, obj);
+        next();
+    },
 
     match: function (req, res, next) {
         
