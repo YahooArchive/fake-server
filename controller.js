@@ -23,7 +23,7 @@ var controller = {
 
 	add : function(req, res, next) {
 		var obj = {
-			verb : req.header["Access-Control-Allow-Methods"],
+			verb : req.headers["Access-Control-Allow-Methods"],
 			delay : req.params.delay,
 			at : req.params.at,
 			route : req.params.route,
@@ -45,7 +45,7 @@ var controller = {
 			// delay: req.params.delay,
 			// at: req.params.at,
 			route : req.params.route,
-			verb : req.headers["Access-Control-Allow-Methods"],
+			verb : req.params.verb,
 			// queryParams: req.params.queryParams,
 			// payload: req.params.payload,
 			responseCode : req.params.responseCode,
@@ -131,7 +131,7 @@ var controller = {
 			username : req.params.username,
 			password : req.params.password,
 		};
-		if (obj.username === 'crodriguez' && obj.password === 'crodriguez') {
+		if (obj.username == 'crodriguez' && obj.password == 'crodriguez') {
 
 			controller.fakeResponse.flush();
 			res.send(200, 'OK');
