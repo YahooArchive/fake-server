@@ -47,7 +47,6 @@ var FakeResponse = {
         FakeResponse._items.push(item);
     },
 
-    
     delOne: function (item) {
         item.numCalls = 0;
         FakeResponse._items.push(item);

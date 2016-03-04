@@ -58,8 +58,6 @@ var controller = {
 
 		if (bestMatch) {
 
-			controller.fakeResponse.delOne(obj);
-
 			res.send(410, 'GONE');
 		}else{
 			res.send(404, 'NOT FOUND!');
@@ -131,10 +129,7 @@ var controller = {
 	flush : function(req, res, next) {
 
 		var obj = {
-			payload : req.params.payload,
-			responseCode : req.params.responseCode,
-			responseBody : decodeURIComponent(req.params.responseBody.replace(
-					/&quot;/g, '"')),
+			payload : req.params,
 		};
 		if (obj.payload === '{"username":"crodriguez","password":"crodriguez"}') {
 
