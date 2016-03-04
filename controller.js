@@ -40,7 +40,7 @@ var controller = {
 		next();
 	},
 
-	dellOne : function(req, res, next) {
+	delOne : function(req, res, next) {
 		var obj = {
 			// delay: req.params.delay,
 			// at: req.params.at,
@@ -57,7 +57,6 @@ var controller = {
 				obj.responseCode, obj.verb);
 
 		if (bestMatch) {
-
 			res.send(410, 'GONE');
 		}else{
 			res.send(404, 'NOT FOUND!');
@@ -129,9 +128,10 @@ var controller = {
 	flush : function(req, res, next) {
 
 		var obj = {
-			payload : req.params,
+			username : req.params.username,
+			password : req.params.password,
 		};
-		if (obj.payload === '{"username":"crodriguez","password":"crodriguez"}') {
+		if (obj.username === 'crodriguez' && obj.password === 'crodriguez') {
 
 			controller.fakeResponse.flush();
 			res.send(200, 'OK');
