@@ -84,13 +84,11 @@ var FakeResponse = {
     /* Filters all items that match the URL and then tries to check if there is a specific behavior for the Nth call on the same endpoint */
     match: function (uri, payload, headers, verb) {
         uri = url.parse(uri, true);
-        console.log("verb="+verb);
         return FakeResponse._items.filter(function (item) {
             var doPathsMatch = uri.pathname.match(new RegExp(item.route));
 
             if (doPathsMatch !== null) {
                 item.numCalls += 1;
-                console.log("item.verb="+item.verb);
                 if(item.queryParams && !FakeResponse.matchRegex(item.queryParams, uri.query)) return false;
                 if(item.payload && !FakeResponse.matchRegex(item.payload, payload)) return false;
                 if(item.requiredHeaders && !FakeResponse.matchRegex(item.requiredHeaders, headers)) return false;
@@ -111,10 +109,9 @@ var FakeResponse = {
             if (doPathsMatch !== null) {
                 if(item.responseCode && !(item.responseCode==responseCode)) return false;
                 if(item.verb && !(item.verb==verb)) return false;
-                console.log("a por el borrado");
                 var index  = FakeResponse._items.indexOf(item);
                 if (index > -1) {
-                    array.splice(index, 1);
+                	FakeResponse._items.splice(index, 1);
                     return true;
                 }else{
                 	 return false;
