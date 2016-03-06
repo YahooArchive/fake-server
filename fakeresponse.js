@@ -105,12 +105,13 @@ var FakeResponse = {
     
     /* Filters all items that match the URL and then tries to check if there is a specific behavior for the Nth call on the same endpoint */
     matchDel: function (uri, responseCode, verb) {
+    	console.log("uri="+uri);
         uri = url.parse(uri, true);
         return FakeResponse._items.filter(function (item) {
             var doPathsMatch = uri.pathname.match(new RegExp(item.route));
-            console.log("doPathsMatch="+doPathsMatch+ ", item.route="+item.route+", uri="+uri+"item.responseCode="+item.responseCode+", responseCode="+responseCode);
+            console.log("doPathsMatch="+doPathsMatch+ ", item.route="+item.route+", item.responseCode="+item.responseCode+", responseCode="+responseCode);
             if (doPathsMatch !== null) {
-                if(item.responseCode && !FakeResponse.matchRegex(item.responseCode, responseCode)) return false;
+                if(item.responseCode && !(item.responseCode==responseCode)) return false;
                 if(item.verb && !(item.verb==verb)) return false;
                 var index  = FakeResponse._items.indexOf(item);
                 if (index > -1) {
