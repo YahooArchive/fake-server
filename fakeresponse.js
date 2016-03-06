@@ -84,7 +84,7 @@ var FakeResponse = {
     /* Filters all items that match the URL and then tries to check if there is a specific behavior for the Nth call on the same endpoint */
     match: function (uri, payload, headers, verb) {
         uri = url.parse(uri, true);
-
+        console.log("verb="+verb);
         return FakeResponse._items.filter(function (item) {
             var doPathsMatch = uri.pathname.match(new RegExp(item.route));
 
