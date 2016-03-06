@@ -19,11 +19,11 @@ FakeResponse.preload(argv.configDir);
 
 var controller = {
 	fakeResponse : FakeResponse, // of course this is here just so that it
-									// can be overwritten easily in the tests.
+	// can be overwritten easily in the tests.
 
 	add : function(req, res, next) {
 		var obj = {
-			verb : req.headers["Access-Control-Allow-Methods"],
+			verb : req.params.verb,
 			delay : req.params.delay,
 			at : req.params.at,
 			route : req.params.route,
@@ -58,7 +58,7 @@ var controller = {
 
 		if (bestMatch) {
 			res.send(410, 'GONE');
-		}else{
+		} else {
 			res.send(404, 'NOT FOUND!');
 		}
 		next();
@@ -89,7 +89,7 @@ var controller = {
 		}
 
 		var bestMatch = controller.fakeResponse.match(req.url, req.body,
-				req.headers);
+				req.headers, req.method);
 
 		if (bestMatch) {
 			var headers = {
@@ -126,19 +126,26 @@ var controller = {
 	},
 
 	flush : function(req, res, next) {
-
+		var autorized = {
+			username : "crodriguez",
+			password : "crodriguez"
+		};
 		var obj = {
 			username : req.params.username,
 			password : req.params.password,
 		};
-		if (obj.username == 'crodriguez' && obj.password == 'crodriguez') {
-
-			controller.fakeResponse.flush();
-			res.send(200, 'OK');
+		console.log("flush( username=" + obj.username + ", password="+ obj.password + ")");
+		if (obj.username == autorized.username) {
+			if (obj.password == autorized.password) {
+				controller.fakeResponse.flush();
+				res.send(200, 'OK');
+				return next();
+			}
 		} else {
 			res.send(401, 'Unauthorized!!!');
+			return next(new restify.ConflictError("I just don't like you"));
 		}
-		return next(new restify.ConflictError("I just don't like you"));
+
 	}
 };
 
