@@ -4,7 +4,10 @@
 
 Fake-server is a generic and non-intrusive tool used to mock any server response. It has been designed to address issues when running tests against unstable or slow external servers.
 
-Modificaciones realizadas por crodriguez
+crodriguez modifications:
+*** Include "verb" param. Now you can add the method of the petition to make a complete RESTful api mock.
+*** Include "delOne" method. If you want, you can del one or more mocks. 
+ 
 
 ===========
 
@@ -109,7 +112,19 @@ Para esto, teneis que poneros en contacto conmigo --> crodriguez
 > responseCode: 200,  
 > responseData: './mock_data/sample.json' }  
 
+##### Same endpoint with different verbs/method
 
+Now, you can do a GET and POST at the same endpoint  
+
+> { route: '/{TUPROYECTO}/login',  
+> responseCode: 200,  
+> responseBody: 'ok',
+> verb: 'GET' }  
+
+> { route: '/{TUPROYECTO}/login',  
+> responseCode: 200,  
+> responseBody: 'You are doing a POST',
+> verb: 'POST' } 
 
 ##### Same endpoint can have different responses 
 
@@ -136,6 +151,18 @@ The following will delay server response in one second:
 > responseBody: 'OK',  
 > delay: 1000 }  
 
+## Delete one petition
+
+Sometimes, you want to remove an entry. So, now you can.
+
+All you have to do is 'DELETE' to http://192.168.6.74:3012/delOne the following data:
+
+Delete /test by deleting:
+> { route: '/{TUPROYECTO}/test',  
+> responseCode: 200,  
+> verb: "GET" }  
+
+
 
 ### Limitations
-- There are reserved endpoints: POST '/add', POST '/getAll'. These cannot be used by your application.
+- There are reserved endpoints: POST '/add', POST '/getAll', DELETE '/delOne'. These cannot be used by your application.
