@@ -165,4 +165,4 @@ Delete /test by deleting:
 
 
 ### Limitations
-- There are reserved endpoints: POST '/add', POST '/getAll', DELETE '/delOne'. These cannot be used by your application.
+- There are reserved endpoints: POST '/add', GET '/getAll', DELETE '/delOne'. These cannot be used by your application.
