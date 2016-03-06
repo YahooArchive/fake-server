@@ -108,7 +108,7 @@ var FakeResponse = {
         uri = url.parse(uri, true);
         return FakeResponse._items.filter(function (item) {
             var doPathsMatch = uri.pathname.match(new RegExp(item.route));
-
+            console.log("doPathsMatch="+doPathsMatch+ ", item.route="+item.route+", uri="+uri+"item.responseCode="+item.responseCode+", responseCode="+responseCode);
             if (doPathsMatch !== null) {
                 if(item.responseCode && !FakeResponse.matchRegex(item.responseCode, responseCode)) return false;
                 if(item.verb && !(item.verb==verb)) return false;
