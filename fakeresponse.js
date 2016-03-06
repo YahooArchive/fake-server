@@ -90,11 +90,13 @@ var FakeResponse = {
 
             if (doPathsMatch !== null) {
                 item.numCalls += 1;
+                console.log("item.verb="+item.verb);
                 if(item.queryParams && !FakeResponse.matchRegex(item.queryParams, uri.query)) return false;
                 if(item.payload && !FakeResponse.matchRegex(item.payload, payload)) return false;
                 if(item.requiredHeaders && !FakeResponse.matchRegex(item.requiredHeaders, headers)) return false;
-                if (item.at) return (item.numCalls === item.at);
                 if(item.verb && item.verb==verb) return false;
+                //Revisar para que sea dividido por el modulo en lugar de solo la primera vez que coincidan
+                if (item.at) return (item.numCalls === item.at);
                 return true;
             }
             return false;
@@ -110,7 +112,7 @@ var FakeResponse = {
 
             if (doPathsMatch !== null) {
                 if(item.responseCode && !FakeResponse.matchRegex(item.responseCode, responseCode)) return false;
-                if(item.verb && !FakeResponse.matchRegex(item.verb, verb)) return false;
+                if(item.verb && item.verb==verb) return false;
                 var index  = FakeResponse._items.indexOf(item);
                 if (index > -1) {
                     array.splice(index, 1);

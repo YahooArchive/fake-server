@@ -42,15 +42,9 @@ var controller = {
 
 	delOne : function(req, res, next) {
 		var obj = {
-			// delay: req.params.delay,
-			// at: req.params.at,
 			route : req.params.route,
 			verb : req.params.verb,
-			// queryParams: req.params.queryParams,
-			// payload: req.params.payload,
 			responseCode : req.params.responseCode,
-		// responseBody:
-		// decodeURIComponent(req.params.responseBody.replace(/&quot;/g, '"')),
 		};
 
 		var bestMatch = controller.fakeResponse.matchDel(obj.route,
