@@ -111,7 +111,7 @@ var FakeResponse = {
 
             if (doPathsMatch !== null) {
                 if(item.responseCode && !FakeResponse.matchRegex(item.responseCode, responseCode)) return false;
-                if(item.verb && item.verb==verb) return false;
+                if(item.verb && !(item.verb==verb)) return false;
                 var index  = FakeResponse._items.indexOf(item);
                 if (index > -1) {
                     array.splice(index, 1);
