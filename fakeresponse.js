@@ -94,7 +94,7 @@ var FakeResponse = {
                 if(item.payload && !FakeResponse.matchRegex(item.payload, payload)) return false;
                 if(item.requiredHeaders && !FakeResponse.matchRegex(item.requiredHeaders, headers)) return false;
                 if (item.at) return (item.numCalls === item.at);
-                if(item.verb && !FakeResponse.matchRegex(item.verb, verb)) return false;
+                if(item.verb && item.verb==verb) return false;
                 return true;
             }
             return false;
