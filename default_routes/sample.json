@@ -16,11 +16,12 @@
             "Cookie": "username=.*"
         },
         "responseBody": "headers match :-)"
-    },
-    {
-        "route": "/HOWTO",
-        "responseCode":200,
-        "responseData": "./README.md"
     }
+//    ,
+//    {
+//        "route": "/HOWTO",
+//        "responseCode":200,
+//        "responseData": "./README.md"
+//    }
     ]
 }

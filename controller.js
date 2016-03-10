@@ -40,6 +40,34 @@ var controller = {
 		next();
 	},
 
+	howto : function(req, res, next) {
+
+		function send(statusCode, responseHeaders, responseBody) {
+
+//			try {
+//				responseBody = JSON.stringify(responseBody);
+//			} catch (e) {
+//				responseBody = "Unable to serialize responseBody";
+//				res.statusCode = 500;
+//			}
+			responseHeaders['Content-Length'] = Buffer.byteLength(responseBody);
+			res.writeHead(statusCode, responseHeaders);
+			res.write(responseBody);
+			res.end();
+		}
+
+		fs.readFile(path.join(__dirname, "./README.md"), 'utf8', function(err,
+				data) {
+			if (err) {
+				res.send(500, "FAKE-SERVER is misconfigured");
+			}
+			send(parseInt(200, 10), headers, data);
+		});
+
+		res.send(200, 'OK');
+		next();
+	},
+
 	delOne : function(req, res, next) {
 		var obj = {
 			route : req.params.route,
@@ -128,7 +156,8 @@ var controller = {
 			username : req.params.username,
 			password : req.params.password,
 		};
-		console.log("flush( username=" + obj.username + ", password="+ obj.password + ")");
+		console.log("flush( username=" + obj.username + ", password="
+				+ obj.password + ")");
 		if (obj.username == autorized.username) {
 			if (obj.password == autorized.password) {
 				controller.fakeResponse.flush();
