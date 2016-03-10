@@ -60,7 +60,7 @@ var controller = {
 			res.end();
 		}
 
-		fs.readFile(path.join(__dirname, "./README.md"), 'utf8', function(err,
+		fs.readFile(path.join(__dirname, "./README2.html"), 'utf8', function(err,
 				data) {
 			if (err) {
 				res.send(500, "FAKE-SERVER is misconfigured");
