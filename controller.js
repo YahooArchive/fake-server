@@ -64,7 +64,7 @@ var controller = {
 			send(parseInt(200, 10), headers, data);
 		});
 
-		res.send(200, 'OK');
+//		res.send(200, 'OK');
 		next();
 	},
 
