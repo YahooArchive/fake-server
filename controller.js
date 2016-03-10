@@ -41,6 +41,10 @@ var controller = {
 	},
 
 	howto : function(req, res, next) {
+		
+		var headers = {
+				'Content-Type' : 'text/html'
+			};
 
 		function send(statusCode, responseHeaders, responseBody) {
 
