@@ -16,12 +16,5 @@
             "Cookie": "username=.*"
         },
         "responseBody": "headers match :-)"
-    }
-//    ,
-//    {
-//        "route": "/HOWTO",
-//        "responseCode":200,
-//        "responseData": "./README.md"
-//    }
-    ]
+    }]
 }
