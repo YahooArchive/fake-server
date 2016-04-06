@@ -1,0 +1,305 @@
+#fake-server
+<br />
+<br />
+[![Build
+Status](https://travis-ci.org/yahoo/fake-server.svg)](https://travis-ci.org/yahoo/fake-server)
+<br />
+<br />
+Fake-server is a generic and non-intrusive tool used to mock any server
+response. It has been designed to address issues when running tests
+against unstable or slow external servers.
+<br />
+<br />
+===========
+<br />
+<br />
+## How it works
+<br />
+<br />
+The idea is to create a webserver listening in a different port and make
+your tests bring it up and configure how it should behave against each
+different request. "Configuration" can be done by posting the parameters
+and desired response to the server, or through configuration files
+inside ./default_routes/.
+<br />
+<br />
+For every request, fake-server will try to match against the configured
+URIs and return the expected response.
+<br />
+<br />
+### Advantages
+<br />
+- No need to instrument your code (as long as the external server endpoint is configurable :P)<br />
+- Generic enough to work with blackbox or whitebox tests.<br />
+- No database required<br />
+<br />
+<br />
+### Quickstart (two really basic scenarios)<br />
+<br />
+Clone this repository (npm package coming soon)<br />
+> git clone git@github.com:yahoo/fake-server.git<br />
+<br />
+Start (it will start a server on port 3012)<br />
+> node server.js<br />
+<br />
+<br />
+Let's say you want "/test" to always return "hello" and
+"/foo" to return a 404.
+<br />
+<br />
+All you have to do is `POST` to http://localhost:3012/add/ the
+following data:
+<br />
+<br />
+Configure /test by posting:
+<br />
+> { route: '/test',
+<br />
+> responseCode: 200,
+<br />
+> responseBody: "hello" }
+<br />
+<br />
+one of the many ways to do this is using cURL:
+<br />
+```
+<br />
+curl http://localhost:3012/add -X POST -H
+"Content-Type:application/json" -H "Accept:application/json" \
+<br />
+-d
+'{"route":"/test","responseCode":200,"responseBody":"hello"}'
+<br />
+```
+<br />
+<br />
+now let's configure our 404 example by sending this to the server:
+<br />
+> { route: '/foo',
+<br />
+> responseCode: 404,
+<br />
+> responseBody: "Not found" }
+<br />
+<br />
+using cURL:
+<br />
+```
+<br />
+curl http://localhost:3012/add -X POST -H
+"Content-Type:application/json" -H "Accept:application/json" \
+<br />
+-d '{"route":"/foo","responseCode":404,"responseBody":"Not
+found"}'
+<br />
+```
+<br />
+<br />
+now, in your browser you can see the results:
+<br />
+http://localhost:3012/foo
+<br />
+http://localhost:3012/test
+<br />
+<br />
+<br />
+### What else can fake-server do?
+<br />
+<br />
+Configuration is done by sending a POST request to /add or by placing a
+json file containing configurations inside a "routes" object (see
+default_routes/sample.json for reference). Here are the supported
+features for this version:
+<br />
+<br />
+##### Routes can be RegEx
+<br />
+<br />
+This will match http://localhost:3012/news/007 as well
+as http://localhost:3012/news/1231293871293827:
+<br />
+<br />
+> { route: '/news/[0-9]'
+<br />
+> responseCode: 200,
+<br />
+> responseBody: 'whatever you want' }
+<br />
+<br />
+##### Fake-server supports "POST" calls and uses payload for matching.
+Regexs are supported for payload matching, and paths can be used to
+specify inner properties of JSON payloads:
+<br />
+<br />
+> { route: '/news'
+<br />
+> payload: {
+<br />
+> id: [\\d+],
+<br />
+> requests[1].user.login: 'jdoe',
+<br />
+> month: "february"
+<br />
+> },
+<br />
+> responseCode: 200,
+<br />
+> responseBody: 'yay! it matches'
+<br />
+> }
+<br />
+<br />
+##### Support for query string matching. All query params are evaluated
+as a RegEx.
+<br />
+<br />
+> { route: '/news',
+<br />
+> queryParams: {
+<br />
+> id: "[\\d+]",
+<br />
+> location: "Hawaii"
+<br />
+> }
+<br />
+> responseCode: 200,
+<br />
+> responseBody: 'Regex matching rocks'
+<br />
+> }
+<br />
+<br />
+##### ... can also use the request Headers. So you can check if specific
+cookies are present, for instance
+<br />
+<br />
+> { route: '/secure',
+<br />
+> requiredHeaders: {
+<br />
+> X-Auth: "secret",
+<br />
+> },
+<br />
+> responseCode: 200,
+<br />
+> responseBody: 'header is there'
+<br />
+> }
+<br />
+<br />
+<br />
+##### Response can be a file. In this case, fake-server will respond
+with the output of that file.
+<br />
+<br />
+The following configuration example will return the output of
+./mock_data/sample.json *(notice the parameter is called responseData
+instead of responseBody)*
+<br />
+<br />
+Para esto, teneis que poneros en contacto conmigo --> crodriguez
+<br />
+<br />
+> { route: '/',
+<br />
+> responseCode: 200,
+<br />
+> responseData: './mock_data/sample.json' }
+<br />
+<br />
+##### Same endpoint with different verbs/method
+<br />
+<br />
+Now, you can do a GET and POST at the same endpoint
+<br />
+<br />
+> { route: '/login',
+<br />
+> responseCode: 200,
+<br />
+> responseBody: 'ok',
+<br />
+> verb: 'GET' }
+<br />
+<br />
+> { route: '/login',
+<br />
+> responseCode: 200,
+<br />
+> responseBody: 'You are doing a POST',
+<br />
+> verb: 'POST' }
+<br />
+<br />
+##### Same endpoint can have different responses
+<br />
+<br />
+This will return '200' in the first two requests to '/' and
+403 on the third request
+<br />
+<br />
+> { route: '/',
+<br />
+> responseCode: 200,
+<br />
+> responseBody: 'ok' }
+<br />
+<br />
+note that I will be adding an 'at' parameter to configure the special
+behavior to the third request:
+<br />
+<br />
+> { route: '/',
+<br />
+> responseCode: 403,
+<br />
+> responseBody: 'Thou shall not pass!',
+<br />
+> at: 3 }
+<br />
+<br />
+<br />
+##### Delay response
+<br />
+<br />
+The following will delay server response in one second:
+<br />
+<br />
+> { route: '/slow/.*',
+<br />
+> responseCode: 200,
+<br />
+> responseBody: 'OK',
+<br />
+> delay: 1000 }
+<br />
+<br />
+## Delete one petition
+<br />
+<br />
+Sometimes, you want to remove an entry. So, now you can.
+<br />
+<br />
+All you have to do is 'DELETE' to http://localhost:3012/delOne the
+following data:
+<br />
+<br />
+Delete /test by deleting:
+<br />
+> { route: '/test',
+<br />
+> responseCode: 200,
+<br />
+> verb: "GET" }
+<br />
+<br />
+<br />
+<br />
+### Limitations
+<br />
+- There are reserved endpoints: POST '/add', GET '/getAll', DELETE
+'/delOne'. These cannot be used by your application.
+<br />

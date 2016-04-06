@@ -47,6 +47,11 @@ var FakeResponse = {
         FakeResponse._items.push(item);
     },
 
+    delOne: function (item) {
+        item.numCalls = 0;
+        FakeResponse._items.push(item);
+    },
+    
     flush: function () {
         FakeResponse._items = [];
     },
@@ -77,9 +82,8 @@ var FakeResponse = {
 
 
     /* Filters all items that match the URL and then tries to check if there is a specific behavior for the Nth call on the same endpoint */
-    match: function (uri, payload, headers) {
+    match: function (uri, payload, headers, verb) {
         uri = url.parse(uri, true);
-
         return FakeResponse._items.filter(function (item) {
             var doPathsMatch = uri.pathname.match(new RegExp(item.route));
 
@@ -88,8 +92,30 @@ var FakeResponse = {
                 if(item.queryParams && !FakeResponse.matchRegex(item.queryParams, uri.query)) return false;
                 if(item.payload && !FakeResponse.matchRegex(item.payload, payload)) return false;
                 if(item.requiredHeaders && !FakeResponse.matchRegex(item.requiredHeaders, headers)) return false;
+                if(item.verb && !(item.verb==verb)) return false;
+                //Revisar para que sea dividido por el modulo en lugar de solo la primera vez que coincidan
                 if (item.at) return (item.numCalls === item.at);
                 return true;
+            }
+            return false;
+        }).sort(FakeResponse.compareMatches)[0] || null;
+    },
+    
+    /* Filters all items that match the URL and then tries to check if there is a specific behavior for the Nth call on the same endpoint */
+    matchDel: function (uri, responseCode, verb) {
+        uri = url.parse(uri, true);
+        return FakeResponse._items.filter(function (item) {
+            var doPathsMatch = uri.pathname.match(new RegExp(item.route));
+            if (doPathsMatch !== null) {
+                if(item.responseCode && !(item.responseCode==responseCode)) return false;
+                if(item.verb && !(item.verb==verb)) return false;
+                var index  = FakeResponse._items.indexOf(item);
+                if (index > -1) {
+                	FakeResponse._items.splice(index, 1);
+                    return true;
+                }else{
+                	 return false;
+                }
             }
             return false;
         }).sort(FakeResponse.compareMatches)[0] || null;
