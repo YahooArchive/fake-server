@@ -151,29 +151,11 @@ var controller = {
 		}
 	},
 
-	flush : function(req, res, next) {
-		var autorized = {
-			username : "crodriguez",
-			password : "crodriguez"
-		};
-		var obj = {
-			username : req.params.username,
-			password : req.params.password,
-		};
-		console.log("flush( username=" + obj.username + ", password="
-				+ obj.password + ")");
-		if (obj.username == autorized.username) {
-			if (obj.password == autorized.password) {
-				controller.fakeResponse.flush();
-				res.send(200, 'OK');
-				return next();
-			}
-		} else {
-			res.send(401, 'Unauthorized!!!');
-			return next(new restify.ConflictError("I just don't like you"));
-		}
-
-	}
+    flush: function (req, res, next) {
+        controller.fakeResponse.flush();
+        res.send(200, 'OK');
+        next();
+    }
 };
 
 module.exports = controller;
