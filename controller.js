@@ -48,12 +48,6 @@ var controller = {
 
 		function send(statusCode, responseHeaders, responseBody) {
 
-//			try {
-//				responseBody = JSON.stringify(responseBody);
-//			} catch (e) {
-//				responseBody = "Unable to serialize responseBody";
-//				res.statusCode = 500;
-//			}
 			responseHeaders['Content-Length'] = Buffer.byteLength(responseBody);
 			res.writeHead(statusCode, responseHeaders);
 			res.write(responseBody);
