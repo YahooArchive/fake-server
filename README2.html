@@ -10,15 +10,6 @@ response. It has been designed to address issues when running tests
 against unstable or slow external servers.
 <br />
 <br />
-crodriguez modifications:
-<br />
-*** Include "verb" param. Now you can add the method of the petition to
-make a complete RESTful api mock.
-<br />
-*** Include "delOne" method. If you want, you can del one or more mocks.
-<br />
-<br />
-<br />
 ===========
 <br />
 <br />
@@ -36,29 +27,33 @@ For every request, fake-server will try to match against the configured
 URIs and return the expected response.
 <br />
 <br />
-## FIRST OF ALL. CALL THE NEXT METHOD TO KNOW IF YOUR ROUTE ALREADY
-EXIST
+### Advantages
 <br />
-curl http://192.168.6.74:3012/getAll
-<br />
-<br />
-<br />
-##### STARTING WITH THIS TEST SERVER
+- No need to instrument your code (as long as the external server endpoint is configurable :P)<br />
+- Generic enough to work with blackbox or whitebox tests.<br />
+- No database required<br />
 <br />
 <br />
+### Quickstart (two really basic scenarios)<br />
+<br />
+Clone this repository (npm package coming soon)<br />
+> git clone git@github.com:yahoo/fake-server.git<br />
+<br />
+Start (it will start a server on port 3012)<br />
+> node server.js<br />
 <br />
 <br />
-Let's say you want "/{TUPROYECTO}/test" to always return "hello" and
-"/{TUPROYECTO}/foo" to return a 404.
+Let's say you want "/test" to always return "hello" and
+"/foo" to return a 404.
 <br />
 <br />
-All you have to do is `POST` to http://192.168.6.74:3012/add/ the
+All you have to do is `POST` to http://localhost:3012/add/ the
 following data:
 <br />
 <br />
 Configure /test by posting:
 <br />
-> { route: '/{TUPROYECTO}/test',
+> { route: '/test',
 <br />
 > responseCode: 200,
 <br />
@@ -69,18 +64,18 @@ one of the many ways to do this is using cURL:
 <br />
 ```
 <br />
-curl http://192.168.6.74:3012/add -X POST -H
+curl http://localhost:3012/add -X POST -H
 "Content-Type:application/json" -H "Accept:application/json" \
 <br />
 -d
-'{"route":"/{TUPROYECTO}/test","responseCode":200,"responseBody":"hello"}'
+'{"route":"/test","responseCode":200,"responseBody":"hello"}'
 <br />
 ```
 <br />
 <br />
 now let's configure our 404 example by sending this to the server:
 <br />
-> { route: '/{TUPROYECTO}/foo',
+> { route: '/foo',
 <br />
 > responseCode: 404,
 <br />
@@ -91,10 +86,10 @@ using cURL:
 <br />
 ```
 <br />
-curl http://192.168.6.74:3012/add -X POST -H
+curl http://localhost:3012/add -X POST -H
 "Content-Type:application/json" -H "Accept:application/json" \
 <br />
--d '{"route":"/{TUPROYECTO}/foo","responseCode":404,"responseBody":"Not
+-d '{"route":"/foo","responseCode":404,"responseBody":"Not
 found"}'
 <br />
 ```
@@ -102,9 +97,9 @@ found"}'
 <br />
 now, in your browser you can see the results:
 <br />
-http://192.168.6.74:3012/{TUPROYECTO}/foo
+http://localhost:3012/foo
 <br />
-http://192.168.6.74:3012/{TUPROYECTO}/test
+http://localhost:3012/test
 <br />
 <br />
 <br />
@@ -120,11 +115,11 @@ features for this version:
 ##### Routes can be RegEx
 <br />
 <br />
-This will match http://192.168.6.74:3012/{TUPROYECTO}/news/007 as well
-as http://192.168.6.74:3012/{TUPROYECTO}/news/1231293871293827:
+This will match http://localhost:3012/news/007 as well
+as http://localhost:3012/news/1231293871293827:
 <br />
 <br />
-> { route: '/{TUPROYECTO}/news/[0-9]'
+> { route: '/news/[0-9]'
 <br />
 > responseCode: 200,
 <br />
@@ -136,7 +131,7 @@ Regexs are supported for payload matching, and paths can be used to
 specify inner properties of JSON payloads:
 <br />
 <br />
-> { route: '/{TUPROYECTO}/news'
+> { route: '/news'
 <br />
 > payload: {
 <br />
@@ -159,7 +154,7 @@ specify inner properties of JSON payloads:
 as a RegEx.
 <br />
 <br />
-> { route: '/{TUPROYECTO}/news',
+> { route: '/news',
 <br />
 > queryParams: {
 <br />
@@ -180,7 +175,7 @@ as a RegEx.
 cookies are present, for instance
 <br />
 <br />
-> { route: '/{TUPROYECTO}/secure',
+> { route: '/secure',
 <br />
 > requiredHeaders: {
 <br />
@@ -208,7 +203,7 @@ instead of responseBody)*
 Para esto, teneis que poneros en contacto conmigo --> crodriguez
 <br />
 <br />
-> { route: '/{TUPROYECTO}/',
+> { route: '/',
 <br />
 > responseCode: 200,
 <br />
@@ -221,7 +216,7 @@ Para esto, teneis que poneros en contacto conmigo --> crodriguez
 Now, you can do a GET and POST at the same endpoint
 <br />
 <br />
-> { route: '/{TUPROYECTO}/login',
+> { route: '/login',
 <br />
 > responseCode: 200,
 <br />
@@ -230,7 +225,7 @@ Now, you can do a GET and POST at the same endpoint
 > verb: 'GET' }
 <br />
 <br />
-> { route: '/{TUPROYECTO}/login',
+> { route: '/login',
 <br />
 > responseCode: 200,
 <br />
@@ -242,11 +237,11 @@ Now, you can do a GET and POST at the same endpoint
 ##### Same endpoint can have different responses
 <br />
 <br />
-This will return '200' in the first two requests to '/{TUPROYECTO}/' and
+This will return '200' in the first two requests to '/' and
 403 on the third request
 <br />
 <br />
-> { route: '/{TUPROYECTO}/',
+> { route: '/',
 <br />
 > responseCode: 200,
 <br />
@@ -257,7 +252,7 @@ note that I will be adding an 'at' parameter to configure the special
 behavior to the third request:
 <br />
 <br />
-> { route: '/{TUPROYECTO}/',
+> { route: '/',
 <br />
 > responseCode: 403,
 <br />
@@ -273,7 +268,7 @@ behavior to the third request:
 The following will delay server response in one second:
 <br />
 <br />
-> { route: '/{TUPROYECTO}/slow/.*',
+> { route: '/slow/.*',
 <br />
 > responseCode: 200,
 <br />
@@ -288,13 +283,13 @@ The following will delay server response in one second:
 Sometimes, you want to remove an entry. So, now you can.
 <br />
 <br />
-All you have to do is 'DELETE' to http://192.168.6.74:3012/delOne the
+All you have to do is 'DELETE' to http://localhost:3012/delOne the
 following data:
 <br />
 <br />
 Delete /test by deleting:
 <br />
-> { route: '/{TUPROYECTO}/test',
+> { route: '/test',
 <br />
 > responseCode: 200,
 <br />
