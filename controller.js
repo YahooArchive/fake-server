@@ -12,7 +12,6 @@ var path = require('path');
 var argv = require('yargs').argv;
 var FakeResponse = require('./fakeresponse.js');
 var merge = require('merge');
-var restify = require('restify');
 
 // Preload routes
 FakeResponse.preload(argv.configDir);
