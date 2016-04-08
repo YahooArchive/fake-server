@@ -171,4 +171,4 @@ To avoid the need to restart fake-server in order to clear the configuration, we
 
 
 ### Limitations
-- There are reserved endpoints: POST '/add', GET '/getAll', DELETE '/delOne'. These cannot be used by your application.
+- There are reserved endpoints: POST '/add', GET '/getAll', DELETE '/delOne' and DELETE, '/flush'. These cannot be used by your application.
