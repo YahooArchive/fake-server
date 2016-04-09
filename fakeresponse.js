@@ -93,7 +93,6 @@ var FakeResponse = {
                 if(item.payload && !FakeResponse.matchRegex(item.payload, payload)) return false;
                 if(item.requiredHeaders && !FakeResponse.matchRegex(item.requiredHeaders, headers)) return false;
                 if(item.verb && !(item.verb==verb)) return false;
-                //Revisar para que sea dividido por el modulo en lugar de solo la primera vez que coincidan
                 if (item.at) return (item.numCalls === item.at);
                 return true;
             }
