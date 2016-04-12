@@ -307,7 +307,8 @@ describe('Integration tests', function () {
             params: {
                 route: '/foo/bar',
                 responseCode: 404,
-                verb: 'GET'
+                verb: 'GET',
+                responseBody: 'You want to delete something',
             }
         };
       
@@ -318,14 +319,17 @@ describe('Integration tests', function () {
                 end: sinon.stub()
             };
 
+        sinon.stub(controller.fakeResponse, 'add');
         
-        sinon.stub(controller.fakeResponse, 'matchDel');
+        controller.add(req, res, function () {});
+        
+        sinon.stub(controller.fakeResponse, 'match');
         
         controller.delOne(req, res, function () {});
         
-        assert.isTrue(controller.fakeResponse.matchDel.calledOnce);
+        assert.isTrue(controller.fakeResponse.match.calledOnce);
         
-        controller.fakeResponse.matchDel.restore();
+        controller.fakeResponse.match.restore();
     });
     
     
