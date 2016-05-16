@@ -153,7 +153,7 @@ The following will delay server response in one second:
 > delay: 1000 }  
 
 
-## Delete one petition
+### Delete one petition
 
 Sometimes, you want to remove an entry. So, now you can.
 
