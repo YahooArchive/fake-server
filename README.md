@@ -165,7 +165,7 @@ Delete /test by deleting:
 > verb: "GET" }  
 
 
-##### Resetting server configuration
+#### Resetting server configuration
 
 To avoid the need to restart fake-server in order to clear the configuration, we've implemented a special endpoint called `/flush`. By sending a `DELETE` request to http://localhost:3012/flush, you will erase all previously configured responses.
 
