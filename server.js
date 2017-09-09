@@ -11,7 +11,7 @@ var server = restify.createServer();
 
 server.use(restify.bodyParser());
 
-require('./routes.js')(server);
+require('./routes/routes.js')(server);
 
 if (module.parent) { // Manhattan
     module.exports = server.server;

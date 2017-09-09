@@ -10,7 +10,7 @@
 var fs = require('fs');
 var path = require('path');
 var argv = require('yargs').argv;
-var FakeResponse = require('./fakeresponse.js');
+var FakeResponse = require('./../libs/fakeresponse.js');
 var merge = require('merge');
 
 // Preload routes 

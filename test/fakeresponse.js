@@ -8,7 +8,7 @@
 'use strict';
 
 var rewire = require('rewire');
-var model = rewire('../fakeresponse.js');
+var model = rewire('../libs/fakeresponse.js');
 var assert = require('chai').assert;
 var when = require('when');
 
