@@ -33,6 +33,15 @@ describe('Integration tests', function () {
         controller.add(req, res, function () {});
 
         assert.isTrue(controller.fakeResponse.add.calledOnce);
+        assert.isTrue(controller.fakeResponse.add.calledWith({
+            delay: undefined,
+            at: undefined,
+            route: '/foo/bar',
+            queryParams: undefined,
+            payload: undefined,
+            responseCode: '404',
+            responseBody: 'Not found, tche!'
+        }))
 
         controller.fakeResponse.add.restore();
     });
@@ -300,5 +309,37 @@ describe('Integration tests', function () {
         assert.isTrue(res.write.calledWith('BLAH'));
         assert.isTrue(res.writeHead.calledWith(123));
 
+    });
+
+    it('should provide a way to add new responses for a given endpoint with responseBody containing json object', function () {
+        var req = {
+            params: {
+                route: '/foo/bar',
+                responseCode: '404',
+                responseBody: {"foo": "bar"}
+            }
+        };
+        var res = {
+            send: sinon.stub()
+        };
+
+        sinon.stub(controller.fakeResponse, 'add');
+
+        controller.add(req, res, function () {
+        });
+
+        assert.isTrue(controller.fakeResponse.add.calledOnce);
+
+        assert.isTrue(controller.fakeResponse.add.calledWith({
+            delay: undefined,
+            at: undefined,
+            route: '/foo/bar',
+            queryParams: undefined,
+            payload: undefined,
+            responseCode: '404',
+            responseBody: {"foo": "bar"}
+        }));
+
+        controller.fakeResponse.add.restore();
     });
 });

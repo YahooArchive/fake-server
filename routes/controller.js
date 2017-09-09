@@ -26,9 +26,13 @@ var controller = {
             route: req.params.route,
             queryParams: req.params.queryParams,
             payload: req.params.payload,
-            responseCode: req.params.responseCode,
-            responseBody: decodeURIComponent(req.params.responseBody.replace(/&quot;/g, '"')),
+            responseCode: req.params.responseCode
         };
+
+        if (typeof req.params.responseBody == 'object')
+            obj.responseBody = req.params.responseBody;
+        else
+            obj.responseBody = decodeURIComponent(req.params.responseBody.replace(/&quot;/g, '"'));
 
         controller.fakeResponse.add(obj);
 
