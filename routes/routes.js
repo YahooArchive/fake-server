@@ -10,6 +10,7 @@ var controller = require('./controller.js');
 
 module.exports = function (server) {
     server.post('/add', controller.add);
+    server.post('/remove', controller.remove);
     server.del('/flush', controller.flush);
     server.get(/(.*)/, controller.match);
     server.post(/(.*)/, controller.match);

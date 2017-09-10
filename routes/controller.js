@@ -86,6 +86,23 @@ var controller = {
         }
     },
 
+    remove: function (req, res, next) {
+        var uri = req.params.route;
+        if (req.params.queryParams) {
+            uri = uri.concat('?');
+            var allParameters = Object.keys(req.params.queryParams);
+            allParameters.forEach(function (parameterName) {
+                uri = uri.concat(parameterName + '=' + req.params.queryParams[parameterName])
+            })
+        }
+
+        if (controller.fakeResponse.remove(uri, req.params.payload, req.params.requiredHeaders))
+            res.send(200, 'OK');
+        else
+            res.send(409, 'NOT OK');
+        next();
+    },
+
     flush: function (req, res, next) {
         controller.fakeResponse.flush();
         res.send(200, 'OK');

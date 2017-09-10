@@ -223,6 +223,10 @@ describe('FakeResponse model tests', function () {
             assert.deepEqual(response.responseCode, 200);
             assert.deepEqual(response.responseBody, 'Query param success');
 
+            // Verifying query param with different value does not match
+            response = model.match('/match/me?a=2&b=1');
+            assert.isNull(response);
+
             model.add({
                 route: '/match/me',
                 queryParams: {
@@ -369,6 +373,65 @@ describe('FakeResponse model tests', function () {
 
             assert.equal(1, model.getAll().length);
         });
+    });
+
+    describe('remove', function () {
+        beforeEach(function () {
+            model._items = [];
+        });
+
+        it('should remove the best matched response description from list of fake response.', function () {
+            const route1 = {
+                route: '/foo/bar',
+                responseCode: 404,
+                responseBody: 'route 1',
+            };
+            const route5 = {
+                route: '/foo/bar',
+                queryParams: {id: 5},
+                responseCode: 200,
+                responseBody: 'route 5',
+            };
+            model.add(route1);
+            model.add(route5);
+
+
+            var response = model.match('/foo/bar?id=5');
+            assert.equal(response.responseBody, route5.responseBody);
+
+            model.remove('/foo/bar?id=5');
+
+            var newResponse = model.match('/foo/bar?id=5');
+            assert.equal(newResponse.responseBody, route1.responseBody);
+        });
+
+        it('should not remove any response description from list of fake response when no response is matched.', function () {
+            const route1 = {
+                route: '/foo/bar',
+                queryParams: {id: 1},
+                responseCode: 404,
+                responseBody: 'route 1',
+            };
+            const route5 = {
+                route: '/foo/bar',
+                queryParams: {id: 5},
+                responseCode: 200,
+                responseBody: 'route 5',
+            };
+            model.add(route1);
+            model.add(route5);
+
+
+            var response = model.match('/foo/bar?id=5');
+            assert.equal(response.responseBody, route5.responseBody);
+
+            model.remove('/foo/bar?id=6');
+
+            var newResponse = model.match('/foo/bar?id=5');
+            assert.equal(newResponse.responseBody, route5.responseBody);
+
+            assert.equal(model.getAll().length, 2);
+        })
     });
 
     describe('flush', function () {

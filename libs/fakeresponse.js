@@ -48,6 +48,18 @@ var FakeResponse = {
         FakeResponse._items.push(item);
     },
 
+    remove: function (url, payload, headers) {
+        const bestMatch = FakeResponse.match(url, payload, headers);
+        const bestMatchIndex = FakeResponse._items.indexOf(bestMatch);
+
+        if (bestMatchIndex != -1) {
+            const numberOfElementToRemove = 1;
+            FakeResponse._items.splice(bestMatchIndex, numberOfElementToRemove);
+            return true;
+        } else
+            return false;
+    },
+
     flush: function () {
         FakeResponse._items = [];
     },

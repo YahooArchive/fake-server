@@ -334,4 +334,31 @@ describe('Integration tests', function () {
 
         controller.fakeResponse.add.restore();
     });
+
+    it('should provide a way to remove existing best matched endpoint', function () {
+        var req = {
+            params: {
+                route: '/foo/bar',
+                queryParams: {'id': 5},
+                payload: {'this': 'that'},
+                requiredHeaders: {'Content-Type': 'application/json'},
+                responseCode: '404',
+                responseBody: {"foo": "bar"}
+            }
+        };
+        var res = {
+            send: sinon.stub()
+        };
+
+        sinon.stub(controller.fakeResponse, 'remove');
+
+        controller.remove(req, res, function () {
+        });
+
+        assert.isTrue(controller.fakeResponse.remove.calledOnce);
+
+        assert.isTrue(controller.fakeResponse.remove.calledWith('/foo/bar?id=5', {'this': 'that'}, {'Content-Type': 'application/json'}));
+
+        controller.fakeResponse.remove.restore();
+    });
 });
