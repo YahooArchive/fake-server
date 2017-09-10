@@ -19,7 +19,7 @@ var FakeResponse = {
 
     preload: function (pathToConfiguration) {
         return when.promise(function (resolve, reject) {
-            var configDir = pathToConfiguration || require(path.join(__dirname, '../config.json')).defaultRoutesConfPath;
+            var configDir = pathToConfiguration || require(path.join(__dirname, '../config.json')).DEFAULT_ROUTES_PATH;
             console.log(configDir);
             console.log('loading config from: ', configDir);
             glob.sync('*.json', {cwd: configDir})

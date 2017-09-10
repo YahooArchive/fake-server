@@ -1,3 +1,4 @@
 {
-    "defaultRoutesConfPath": "./default_routes"
+    "PORT": 3012,
+    "DEFAULT_ROUTES_PATH": "./default_routes"
 }

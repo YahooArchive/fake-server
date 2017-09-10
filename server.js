@@ -5,6 +5,7 @@
  */
 
 'use strict';
+var path = require('path');
 
 var restify = require('restify');
 var server = restify.createServer();
@@ -13,10 +14,12 @@ server.use(restify.bodyParser());
 
 require('./routes/routes.js')(server);
 
+const PORT = require(path.join(__dirname, 'config.json')).PORT;
+
 if (module.parent) { // Manhattan
     module.exports = server.server;
 } else {
-    server.listen(3012, function () {
+    server.listen(PORT, function () {
         console.log('%s listening at %s', server.name, server.url);
     });
 }
