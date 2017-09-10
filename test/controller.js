@@ -33,15 +33,11 @@ describe('Integration tests', function () {
         controller.add(req, res, function () {});
 
         assert.isTrue(controller.fakeResponse.add.calledOnce);
-        assert.isTrue(controller.fakeResponse.add.calledWith({
-            delay: undefined,
-            at: undefined,
+        assert.isTrue(controller.fakeResponse.add.calledWith(sinon.match({
             route: '/foo/bar',
-            queryParams: undefined,
-            payload: undefined,
             responseCode: '404',
             responseBody: 'Not found, tche!'
-        }))
+        })));
 
         controller.fakeResponse.add.restore();
     });
@@ -330,15 +326,11 @@ describe('Integration tests', function () {
 
         assert.isTrue(controller.fakeResponse.add.calledOnce);
 
-        assert.isTrue(controller.fakeResponse.add.calledWith({
-            delay: undefined,
-            at: undefined,
+        assert.isTrue(controller.fakeResponse.add.calledWith(sinon.match({
             route: '/foo/bar',
-            queryParams: undefined,
-            payload: undefined,
             responseCode: '404',
             responseBody: {"foo": "bar"}
-        }));
+        })));
 
         controller.fakeResponse.add.restore();
     });

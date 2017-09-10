@@ -11,6 +11,7 @@ var fs = require('fs');
 var path = require('path');
 var argv = require('yargs').argv;
 var FakeResponse = require('./../libs/fakeresponse.js');
+var ResponseDescBuilder = require('../libs/responseDescBuilder.js');
 var merge = require('merge');
 
 // Preload routes 
@@ -20,21 +21,16 @@ var controller = {
     fakeResponse: FakeResponse, // of course this is here just so that it can be overwritten easily in the tests.
 
     add: function (req, res, next) {
-        var obj = {
-            delay: req.params.delay,
-            at: req.params.at,
-            route: req.params.route,
-            queryParams: req.params.queryParams,
-            payload: req.params.payload,
-            responseCode: req.params.responseCode
-        };
+        var responseDesc = new ResponseDescBuilder(req.params.route)
+            .withQueryParams(req.params.queryParams)
+            .withHeaders(req.params.requiredHeaders)
+            .withPayload(req.params.payload)
+            .sendResponseBody(req.params.responseBody)
+            .sendResponseCode(req.params.responseCode)
+            .delayResponseBy(req.params.delay)
+            .respondAtCall(req.params.at);
 
-        if (typeof req.params.responseBody == 'object')
-            obj.responseBody = req.params.responseBody;
-        else
-            obj.responseBody = decodeURIComponent(req.params.responseBody.replace(/&quot;/g, '"'));
-
-        controller.fakeResponse.add(obj);
+        controller.fakeResponse.add(responseDesc);
 
         res.send(200, 'OK');
         next();
