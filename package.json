@@ -15,7 +15,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git@github.com:yahoo/fake-server.git"
+    "url": "git@github.com:crazylab/fake-server.git"
   },
   "readmeFilename": "README.md",
   "devDependencies": {

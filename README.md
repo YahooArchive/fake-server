@@ -22,7 +22,7 @@ For every request, fake-server will try to match against the configured URIs and
 ### Quickstart (two really basic scenarios)
 
 Clone this repository (npm package coming soon)
-> git clone git@github.com:yahoo/fake-server.git
+> git clone git@github.com:crazylab/fake-server.git
 
 Start (it will start a server on port 3012)
 > node server.js
@@ -138,10 +138,21 @@ The following will delay server response in one second:
 > responseBody: 'OK',  
 > delay: 1000 }  
 
+##### Remove Endpoint
+To remove an endpoint you have to send `POST` request to '/remove':
+
+> { route: '/foo/bar',  
+> responseCode: 200,  
+> responseBody: 'OK',  
+> delay: 1000 }
+
+will remove `/foo/bar` endpoint. If there are multiple `foo/bar` endpoint available, it will remove the best matched endpoint only.
+
+
 ##### Resetting server configuration
 
 To avoid the need to restart fake-server in order to clear the configuration, we've implemented a special endpoint called `/flush`. By sending a `DELETE` request to http://localhost:3012/flush, you will erase all previously configured responses.
 
 
 ### Limitations
-- There are two reserved endpoints: POST '/add' and  `DELETE` '/flush'. These cannot be used by your application.
+- There are three reserved endpoints: `POST` '/add', '/remove' and  `DELETE` '/flush'. These cannot be used by your application.
