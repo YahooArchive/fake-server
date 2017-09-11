@@ -339,7 +339,7 @@ describe('Integration tests', function () {
         var req = {
             params: {
                 route: '/foo/bar',
-                queryParams: {'id': 5},
+                queryParams: {'id': 5, 'username': 'foo'},
                 payload: {'this': 'that'},
                 requiredHeaders: {'Content-Type': 'application/json'},
                 responseCode: '404',
@@ -357,7 +357,7 @@ describe('Integration tests', function () {
 
         assert.isTrue(controller.fakeResponse.remove.calledOnce);
 
-        assert.isTrue(controller.fakeResponse.remove.calledWith('/foo/bar?id=5', {'this': 'that'}, {'Content-Type': 'application/json'}));
+        assert.isTrue(controller.fakeResponse.remove.calledWith('/foo/bar?id=5&username=foo', {'this': 'that'}, {'Content-Type': 'application/json'}));
 
         controller.fakeResponse.remove.restore();
     });

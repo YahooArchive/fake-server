@@ -89,11 +89,12 @@ var controller = {
     remove: function (req, res, next) {
         var uri = req.params.route;
         if (req.params.queryParams) {
-            uri = uri.concat('?');
             var allParameters = Object.keys(req.params.queryParams);
-            allParameters.forEach(function (parameterName) {
-                uri = uri.concat(parameterName + '=' + req.params.queryParams[parameterName])
-            })
+            var params = allParameters.map(function (parameterName) {
+                return parameterName + '=' + req.params.queryParams[parameterName]
+            }).join('&');
+
+            uri = uri.concat('?').concat(params);
         }
 
         if (controller.fakeResponse.remove(uri, req.params.payload, req.params.requiredHeaders))
