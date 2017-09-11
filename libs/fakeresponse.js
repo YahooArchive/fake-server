@@ -20,7 +20,6 @@ var FakeResponse = {
     preload: function (pathToConfiguration) {
         return when.promise(function (resolve, reject) {
             var configDir = pathToConfiguration || require(path.join(__dirname, '../config.json')).DEFAULT_ROUTES_PATH;
-            console.log(configDir);
             console.log('loading config from: ', configDir);
             glob.sync('*.json', {cwd: configDir})
                 .forEach(function eachFile(file) {
@@ -45,6 +44,7 @@ var FakeResponse = {
 
     add: function (item) {
         item.numCalls = 0;
+        item.timestamp = new Date().getTime();
         FakeResponse._items.push(item);
     },
 
@@ -84,8 +84,15 @@ var FakeResponse = {
             return queryCmp;
         }
 
-        /*If still tied, rank on quality of 'headers' match*/
-        return Object.keys(matchB.requiredHeaders || {}).length - Object.keys(matchA.requiredHeaders || {}).length;
+        /*Third rank on the number of 'headers' match*/
+        var numHeadersMatchedB = Object.keys(matchB.requiredHeaders || {}).length;
+        var numHeadersMatchedA = Object.keys(matchA.requiredHeaders || {}).length;
+        var headerCmp = numHeadersMatchedB - numHeadersMatchedA;
+        if(0 !== headerCmp)
+            return headerCmp;
+
+        /*If still tied, rank on latest response*/
+        return matchB.timestamp - matchA.timestamp;
     },
 
 

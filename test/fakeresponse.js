@@ -356,6 +356,36 @@ describe('FakeResponse model tests', function () {
             response = model.match('/match/me?a=1234');
             assert.equal(response.responseCode, 400);
         });
+
+        it('should send the latest response when more than one are exact match', function () {
+            var route1 = {
+                route: '/match/me',
+                queryParams: {
+                    a: '1'
+                },
+                responseCode: 200,
+                responseBody: 'This is the old response.'
+            };
+            var route2 = {
+                route: '/match/me',
+                queryParams: {
+                    a: '1'
+                },
+                responseCode: 420,
+                responseBody: 'This is the new response.'
+            };
+            model.add(route1);
+
+            //Doing time pass before next request so that timestamp changes
+            var waitTill = new Date(new Date().getTime() + 1);
+            while(waitTill > new Date()){}
+
+            model.add(route2);
+            var response = model.match('/match/me?a=1');
+            assert.equal(response.responseCode, 420);
+
+            assert.equal(response.responseBody, 'This is the new response.');
+        });
     });
 
     describe('add', function () {
