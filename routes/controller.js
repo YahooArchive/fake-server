@@ -64,13 +64,13 @@ var controller = {
             }
             if(bestMatch.responseData) {
 
-                fs.readFile(path.join(__dirname, bestMatch.responseData),'utf8', function(err, data) {
+                fs.readFile(path.join(bestMatch.responseData),'utf8', function(err, data) {
                     if (err) {
                         res.send(500, "FAKE-SERVER is misconfigured");
-                    } 
+                    }
                     send(parseInt(bestMatch.responseCode, 10), headers, data);
                 });
-                
+
             } else {
                 send(parseInt(bestMatch.responseCode, 10), headers, bestMatch.responseBody);
             }
