@@ -39,6 +39,11 @@ ResponseDesc.prototype = {
         return this;
     },
 
+    sendResponseHeaders: function(headers) {
+        setValueIfDefined(this, 'responseHeaders', headers);
+        return this;
+    },
+
     delayResponseBy: function (ms) {
         setValueIfDefined(this, 'delay', ms);
         return this;

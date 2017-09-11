@@ -108,6 +108,23 @@ describe('ResponseDescBuilder Test', function () {
         });
     });
 
+    describe('sendResponseHeaders(headers)', function () {
+        it('should set "responseHeaders" key with the given headers', function () {
+            var responseHeaders = {'Access-Control-Allow-Origin': 'http://localhost:3012'};
+            var fakeResponseDesc = new ResponseDescBuilder('/foo/bar')
+                .sendResponseHeaders(responseHeaders);
+
+            assert.equal(fakeResponseDesc.responseHeaders, responseHeaders)
+        });
+
+        it('should not set "responseHeaders" key no header is given', function () {
+            var fakeResponseDesc = new ResponseDescBuilder('/foo/bar')
+                .sendResponseHeaders();
+
+            assert.doesNotHaveAnyKeys(fakeResponseDesc, ['responseHeaders']);
+        });
+    });
+
     describe('delayResponseBody(ms)', function () {
         it('should set "delay" key with given response delay in ms', function () {
             var responseDelay = 10;

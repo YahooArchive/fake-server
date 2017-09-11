@@ -22,6 +22,7 @@ describe('Integration tests', function () {
                 route: '/foo/bar',
                 responseCode: '404',
                 responseBody: 'Not found, tche!',
+                responseHeaders: {'Access-Control-Allow-Origin': 'http://localhost:3012'}
             }
         };
         var res = {
@@ -36,7 +37,8 @@ describe('Integration tests', function () {
         assert.isTrue(controller.fakeResponse.add.calledWith(sinon.match({
             route: '/foo/bar',
             responseCode: '404',
-            responseBody: 'Not found, tche!'
+            responseBody: 'Not found, tche!',
+            responseHeaders: {'Access-Control-Allow-Origin': 'http://localhost:3012'}
         })));
 
         controller.fakeResponse.add.restore();

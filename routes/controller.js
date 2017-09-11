@@ -29,6 +29,7 @@ var controller = {
             .withPayload(req.params.payload)
             .sendResponseBody(req.params.responseBody)
             .sendResponseCode(req.params.responseCode)
+            .sendResponseHeaders(req.params.responseHeaders)
             .delayResponseBy(req.params.delay)
             .respondAtCall(req.params.at);
 
