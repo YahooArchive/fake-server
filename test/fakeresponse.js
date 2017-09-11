@@ -411,12 +411,12 @@ describe('FakeResponse model tests', function () {
         });
 
         it('should remove the best matched response description from list of fake response.', function () {
-            const route1 = {
+            var route1 = {
                 route: '/foo/bar',
                 responseCode: 404,
                 responseBody: 'route 1',
             };
-            const route5 = {
+            var route5 = {
                 route: '/foo/bar',
                 queryParams: {id: 5},
                 responseCode: 200,
@@ -436,13 +436,13 @@ describe('FakeResponse model tests', function () {
         });
 
         it('should not remove any response description from list of fake response when no response is matched.', function () {
-            const route1 = {
+            var route1 = {
                 route: '/foo/bar',
                 queryParams: {id: 1},
                 responseCode: 404,
                 responseBody: 'route 1',
             };
-            const route5 = {
+            var route5 = {
                 route: '/foo/bar',
                 queryParams: {id: 5},
                 responseCode: 200,

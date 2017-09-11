@@ -49,11 +49,11 @@ var FakeResponse = {
     },
 
     remove: function (url, payload, headers) {
-        const bestMatch = FakeResponse.match(url, payload, headers);
-        const bestMatchIndex = FakeResponse._items.indexOf(bestMatch);
+        var bestMatch = FakeResponse.match(url, payload, headers);
+        var bestMatchIndex = FakeResponse._items.indexOf(bestMatch);
 
         if (bestMatchIndex != -1) {
-            const numberOfElementToRemove = 1;
+            var numberOfElementToRemove = 1;
             FakeResponse._items.splice(bestMatchIndex, numberOfElementToRemove);
             return true;
         } else
