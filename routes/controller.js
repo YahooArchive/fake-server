@@ -21,6 +21,8 @@ var controller = {
     fakeResponse: FakeResponse, // of course this is here just so that it can be overwritten easily in the tests.
 
     add: function (req, res, next) {
+        console.log('INFO: add :: ' + req.params.route);
+
         var responseDesc = new ResponseDescBuilder(req.params.route)
             .withQueryParams(req.params.queryParams)
             .withHeaders(req.params.requiredHeaders)
@@ -37,7 +39,8 @@ var controller = {
     },
 
     match: function (req, res, next) {
-        
+        console.log('INFO: match :: ' + req.url);
+
         function send (statusCode, responseHeaders, responseBody) {
             if (typeof responseBody === "object") {
                 try {
@@ -87,6 +90,8 @@ var controller = {
     },
 
     remove: function (req, res, next) {
+        console.log('INFO: remove :: ' + req.params.route);
+
         var uri = req.params.route;
         if (req.params.queryParams) {
             var allParameters = Object.keys(req.params.queryParams);
@@ -105,6 +110,8 @@ var controller = {
     },
 
     flush: function (req, res, next) {
+        console.log('INFO: flush :: ');
+
         controller.fakeResponse.flush();
         res.send(200, 'OK');
         next();
