@@ -6,6 +6,7 @@
 
 'use strict';
 var path = require('path');
+var argv = require('yargs').argv;
 
 var restify = require('restify');
 var server = restify.createServer();
@@ -14,7 +15,7 @@ server.use(restify.bodyParser());
 
 require('./routes/routes.js')(server);
 
-const PORT = require(path.join(__dirname, 'config.json')).PORT;
+const PORT = argv.port || require(path.join(__dirname, 'config.json')).PORT;
 
 if (module.parent) { // Manhattan
     module.exports = server.server;

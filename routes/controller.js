@@ -15,7 +15,7 @@ var ResponseDescBuilder = require('../libs/responseDescBuilder.js');
 var merge = require('merge');
 
 // Preload routes 
-FakeResponse.preload(argv.configDir);
+FakeResponse.preload(argv.defaultRoutesDir || require(path.join(__dirname, '../config.json')).DEFAULT_ROUTES_PATH);
 
 var controller = {
     fakeResponse: FakeResponse, // of course this is here just so that it can be overwritten easily in the tests.
