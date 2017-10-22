@@ -65,25 +65,29 @@ var controller = {
         }
 
         var bestMatch = controller.fakeResponse.match(req.url, req.body, req.headers);
-
         if (bestMatch) {
-            if (bestMatch.responseData) {
-                fs.readFile(path.join(bestMatch.responseData), 'utf8', function (err, data) {
-                    if (err) {
-                        res.send(500, "Error reading file at " + path.resolve(bestMatch.responseData));
-                    }
-                    send(parseInt(bestMatch.responseCode, 10), bestMatch.responseHeaders, data);
-                });
+            var sendBestMatchResponse = function () {
+                if (bestMatch.responseData) {
 
-            } else {
-                send(parseInt(bestMatch.responseCode, 10), bestMatch.responseHeaders, bestMatch.responseBody);
-            }
+                    fs.readFile(path.join(bestMatch.responseData), 'utf8', function (err, data) {
+                        if (err) {
+                            res.send(500, "Error reading file at " + path.resolve(bestMatch.responseData));
+                        }
+                        send(parseInt(bestMatch.responseCode, 10), bestMatch.responseHeaders, data);
+                    });
+                } else if (bestMatch.responseBody) {
+                    send(parseInt(bestMatch.responseCode, 10), bestMatch.responseHeaders, bestMatch.responseBody);
+                } else {
+                    next();
+                }
+            };
 
             if (bestMatch.delay) {
-                setTimeout(next, bestMatch.delay);
+                setTimeout(sendBestMatchResponse, bestMatch.delay);
             } else {
-                next();
+                sendBestMatchResponse()
             }
+
         } else {
             res.send(404, 'no match!');
             next();

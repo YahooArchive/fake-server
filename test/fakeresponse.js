@@ -391,8 +391,8 @@ describe('FakeResponse model tests', function () {
             model.add(route1);
 
             //Doing time pass before next request so that timestamp changes
-            var waitTill = new Date(new Date().getTime() + 1);
-            while(waitTill.getTime() > new Date().getTime()){}
+            var waitTill = new Date().getTime() + 1;
+            while(waitTill > new Date().getTime()){}
 
             model.add(route2);
             var response = model.match('/match/me?a=1');

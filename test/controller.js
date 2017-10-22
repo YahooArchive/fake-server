@@ -164,11 +164,11 @@ describe('Integration tests', function () {
 
         clock.tick(delay - 1);
 
-        assert.isTrue(next.notCalled, 'next should not be called before specified delay');
+        assert.isTrue(res.end.notCalled, 'end should not be called before specified delay');
 
         clock.tick(delay + 1);
 
-        assert.isTrue(next.calledOnce);
+        assert.isTrue(res.end.calledOnce);
 
         clock.restore();
         done();
