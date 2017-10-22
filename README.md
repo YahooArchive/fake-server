@@ -44,7 +44,7 @@ Configure `/test` by posting:
 {
   "route": "/test",
   "responseCode": 200,
-  "responseBody": "hello" 
+  "responseBody": "hello"
 }
 ```
 

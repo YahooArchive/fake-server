@@ -206,7 +206,7 @@ describe('Integration tests', function () {
         assert.isTrue(res.end.calledOnce);
     });
 
-    it('Should respond with header text/plain when response is of type text', function () {
+    it('Should respond with header text/html when response is of type text', function () {
         var next = sinon.stub(),
             obj = {
                 route: '/abc',
@@ -232,7 +232,7 @@ describe('Integration tests', function () {
         }, res, next);
 
 
-        assert.isTrue(res.writeHead.calledWithExactly(200, {"Content-Type": "'text/plain'", 'Content-Length': 2}));
+        assert.isTrue(res.writeHead.calledWithExactly(200, {"Content-Type": "'text/html'", 'Content-Length': 2}));
         assert.isTrue(res.write.calledWithExactly('OK'));
         assert.isTrue(res.end.calledOnce);
     });

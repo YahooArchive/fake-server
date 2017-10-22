@@ -45,7 +45,7 @@ var controller = {
 
         function send(statusCode, responseHeaders, responseBody) {
             var contentTypeApplicationJson = {"Content-Type": "application/json"};
-            var contentTypePlainText = {"Content-Type": "'text/plain'"};
+            var contentTypeTextHtml = {"Content-Type": "'text/html'"};
 
             if (typeof responseBody === "object") {
                 try {
@@ -56,7 +56,7 @@ var controller = {
                     res.statusCode = 500;
                 }
             }
-            responseHeaders = merge(contentTypePlainText, responseHeaders);
+            responseHeaders = merge(contentTypeTextHtml, responseHeaders);
             responseHeaders['Content-Length'] = Buffer.byteLength(responseBody);
 
             res.writeHead(statusCode, responseHeaders);
