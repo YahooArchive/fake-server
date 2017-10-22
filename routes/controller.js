@@ -42,16 +42,22 @@ var controller = {
     match: function (req, res, next) {
         console.log('INFO: match :: ' + req.url);
 
-        function send (statusCode, responseHeaders, responseBody) {
+        function send(statusCode, responseHeaders, responseBody) {
+            var contentTypeApplicationJson = {"Content-Type": "application/json"};
+            var contentTypePlainText = {"Content-Type": "'text/plain'"};
+
             if (typeof responseBody === "object") {
                 try {
                     responseBody = JSON.stringify(responseBody);
+                    responseHeaders = merge(contentTypeApplicationJson, responseHeaders)
                 } catch (e) {
                     responseBody = "Unable to serialize responseBody";
                     res.statusCode = 500;
                 }
             }
+            responseHeaders = merge(contentTypePlainText, responseHeaders);
             responseHeaders['Content-Length'] = Buffer.byteLength(responseBody);
+
             res.writeHead(statusCode, responseHeaders);
             res.write(responseBody);
             res.end();
@@ -60,23 +66,16 @@ var controller = {
         var bestMatch = controller.fakeResponse.match(req.url, req.body, req.headers);
 
         if (bestMatch) {
-            var headers = {
-                'Content-Type': 'application/json'
-            };
-            if(bestMatch.responseHeaders) {
-                headers = merge(headers, bestMatch.responseHeaders);
-            }
-            if(bestMatch.responseData) {
-
-                fs.readFile(path.join(bestMatch.responseData),'utf8', function(err, data) {
+            if (bestMatch.responseData) {
+                fs.readFile(path.join(bestMatch.responseData), 'utf8', function (err, data) {
                     if (err) {
                         res.send(500, "FAKE-SERVER is misconfigured");
                     }
-                    send(parseInt(bestMatch.responseCode, 10), headers, data);
+                    send(parseInt(bestMatch.responseCode, 10), bestMatch.responseHeaders, data);
                 });
 
             } else {
-                send(parseInt(bestMatch.responseCode, 10), headers, bestMatch.responseBody);
+                send(parseInt(bestMatch.responseCode, 10), bestMatch.responseHeaders, bestMatch.responseBody);
             }
 
             if (bestMatch.delay) {

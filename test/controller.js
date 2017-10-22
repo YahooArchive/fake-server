@@ -175,9 +175,39 @@ describe('Integration tests', function () {
     });
 
 
-    it('Should Default to header application/json', function () {
+    it('Should respond with header application/json when response is of type JSON', function () {
         var next = sinon.stub(),
 
+            obj = {
+                route: '/abc',
+                responseCode: 200,
+                responseBody: {"foo": "bar"}
+            },
+            req = {
+                params: {
+                    route: '/abc',
+                }
+            },
+            res = {
+                send: sinon.stub(),
+                write: sinon.stub(),
+                writeHead: sinon.stub(),
+                end: sinon.stub()
+            };
+
+        controller.fakeResponse.add(obj);
+
+        controller.match({
+            url: '/abc',
+        }, res, next);
+
+        assert.isTrue(res.writeHead.calledWithExactly(200, {'Content-Type': 'application/json', 'Content-Length': 13}));
+        assert.isTrue(res.write.calledWithExactly('OK'));
+        assert.isTrue(res.end.calledOnce);
+    });
+
+    it('Should respond with header text/plain when response is of type text', function () {
+        var next = sinon.stub(),
             obj = {
                 route: '/abc',
                 responseCode: 200,
@@ -201,13 +231,13 @@ describe('Integration tests', function () {
             url: '/abc',
         }, res, next);
 
-        
-        assert.isTrue(res.writeHead.calledWithExactly(200, {'Content-Type': 'application/json', 'Content-Length': 2}));
+
+        assert.isTrue(res.writeHead.calledWithExactly(200, {"Content-Type": "'text/plain'", 'Content-Length': 2}));
         assert.isTrue(res.write.calledWithExactly('OK'));
         assert.isTrue(res.end.calledOnce);
     });
 
-    it('should work with POST requests', function() {
+    it('should work with POST requests', function () {
         var next = sinon.stub(),
             obj = {
                 route: '/abc',
@@ -243,7 +273,7 @@ describe('Integration tests', function () {
         assert.isTrue(res.end.calledOnce);
     });
 
-    it('should allow header matching (no-match)', function() {
+    it('should allow header matching (no-match)', function () {
         var config = {
             route: '/x',
             requiredHeaders: {
@@ -260,7 +290,7 @@ describe('Integration tests', function () {
             }
         };
 
-        var res = { 
+        var res = {
             send: sinon.stub(),
             write: sinon.stub(),
             writeHead: sinon.stub(),
@@ -294,7 +324,7 @@ describe('Integration tests', function () {
             }
         };
 
-        var res = { 
+        var res = {
             send: sinon.stub(),
             write: sinon.stub(),
             writeHead: sinon.stub(),
