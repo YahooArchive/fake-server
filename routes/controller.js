@@ -28,6 +28,7 @@ var controller = {
             .withHeaders(req.params.requiredHeaders)
             .withPayload(req.params.payload)
             .sendResponseBody(req.params.responseBody)
+            .sendResponseData(req.params.responseData)
             .sendResponseCode(req.params.responseCode)
             .sendResponseHeaders(req.params.responseHeaders)
             .delayResponseBy(req.params.delay)
@@ -69,7 +70,7 @@ var controller = {
             if (bestMatch.responseData) {
                 fs.readFile(path.join(bestMatch.responseData), 'utf8', function (err, data) {
                     if (err) {
-                        res.send(500, "FAKE-SERVER is misconfigured");
+                        res.send(500, "Error reading file at " + path.resolve(bestMatch.responseData));
                     }
                     send(parseInt(bestMatch.responseCode, 10), bestMatch.responseHeaders, data);
                 });

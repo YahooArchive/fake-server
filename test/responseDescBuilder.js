@@ -108,6 +108,23 @@ describe('ResponseDescBuilder Test', function () {
         });
     });
 
+    describe('sendResponseData(relativeFilePath)', function () {
+        it('should set "responseData" key with given relative file path from server', function () {
+            var responseData = './foo/bar.json';
+            var fakeResponseDesc = new ResponseDescBuilder('/foo/bar')
+                .sendResponseData(responseData);
+
+            assert.equal(fakeResponseDesc.responseData, responseData)
+        });
+
+        it('should not set "responseData" key when file path is not provided', function () {
+            var fakeResponseDesc = new ResponseDescBuilder('/foo/bar')
+                .sendResponseData();
+
+            assert.equal(fakeResponseDesc.responseData, undefined)
+        });
+    });
+
     describe('sendResponseHeaders(headers)', function () {
         it('should set "responseHeaders" key with the given headers', function () {
             var responseHeaders = {'Access-Control-Allow-Origin': 'http://localhost:3012'};

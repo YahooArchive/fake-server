@@ -47,6 +47,11 @@ ResponseDesc.prototype = {
         return this;
     },
 
+    sendResponseData: function (relativeFilePath) {
+        setValueIfDefined(this, 'responseData', relativeFilePath);
+        return this;
+    },
+
     sendResponseHeaders: function (headers) {
         setValueIfDefined(this, 'responseHeaders', headers);
         return this;

@@ -367,6 +367,34 @@ describe('Integration tests', function () {
         controller.fakeResponse.add.restore();
     });
 
+    it('should provide a way to add new responses for a given endpoint with responseData containing relative file path', function () {
+        var req = {
+            params: {
+                route: '/foo/bar',
+                responseCode: '404',
+                responseData: "./foo/bar.json"
+            }
+        };
+        var res = {
+            send: sinon.stub()
+        };
+
+        sinon.stub(controller.fakeResponse, 'add');
+
+        controller.add(req, res, function () {
+        });
+
+        assert.isTrue(controller.fakeResponse.add.calledOnce);
+
+        assert.isTrue(controller.fakeResponse.add.calledWith(sinon.match({
+            route: '/foo/bar',
+            responseCode: '404',
+            responseData: "./foo/bar.json"
+        })));
+
+        controller.fakeResponse.add.restore();
+    });
+
     it('should provide a way to remove existing best matched endpoint', function () {
         var req = {
             params: {
