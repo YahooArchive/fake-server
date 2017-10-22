@@ -324,6 +324,20 @@ describe('FakeResponse model tests', function () {
             assert.equal(response.responseCode, 400);
         });
 
+        it('should match respond with configured value when header is matched', function () {
+            var route1 = {
+                route: '/match/me',
+                requiredHeaders: {
+                    Cookie: 'foo'
+                },
+                responseCode: 200
+            };
+            model.add(route1);
+
+            var response = model.match('/match/me?a=1234', null, {Cookie: 'foo'});
+            assert.equal(response.responseCode, 200);
+        });
+
         it('should use number of headers matched to break ties, if num query params matched is the same', function () {
             var route1 = {
                 route: '/match/me',
@@ -378,7 +392,7 @@ describe('FakeResponse model tests', function () {
 
             //Doing time pass before next request so that timestamp changes
             var waitTill = new Date(new Date().getTime() + 1);
-            while(waitTill > new Date()){}
+            while(waitTill.getTime() > new Date().getTime()){}
 
             model.add(route2);
             var response = model.match('/match/me?a=1');

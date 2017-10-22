@@ -202,7 +202,7 @@ describe('Integration tests', function () {
         }, res, next);
 
         assert.isTrue(res.writeHead.calledWithExactly(200, {'Content-Type': 'application/json', 'Content-Length': 13}));
-        assert.isTrue(res.write.calledWithExactly('OK'));
+        assert.isTrue(res.write.calledWithExactly(JSON.stringify({"foo": "bar"})));
         assert.isTrue(res.end.calledOnce);
     });
 
@@ -277,7 +277,7 @@ describe('Integration tests', function () {
         var config = {
             route: '/x',
             requiredHeaders: {
-                'Cookie': 'A=.*'
+                'cookie': 'A=.*'
             },
             responseCode: 123,
             responseBody: "BLAH"
@@ -307,7 +307,7 @@ describe('Integration tests', function () {
         var config = {
             route: '/x',
             requiredHeaders: {
-                'Cookie': 'A=.*'
+                'cookie': 'A=.*'
             },
             responseCode: 123,
             responseBody: "BLAH"
@@ -316,8 +316,8 @@ describe('Integration tests', function () {
         var req = {
             url: '/x',
             headers: {
-                'Some': 'thing',
-                'Cookie': 'A=adsfadfadsf'
+                'some': 'thing',
+                'cookie': 'A=adsfadfadsf'
             },
             params: {
                 route: '/x'

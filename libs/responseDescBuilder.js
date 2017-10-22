@@ -8,6 +8,14 @@ var setValueIfDefined = function (obj, key, value) {
     return obj;
 };
 
+var withLoweredKeys = function (obj) {
+    if (obj == undefined) return undefined;
+    return Object.keys(obj).reduce(function (withLoweredKey, key) {
+        withLoweredKey[key.toLowerCase()] = obj[key];
+        return withLoweredKey;
+    }, {});
+};
+
 ResponseDesc.prototype = {
     withQueryParams: function (parameters) {
         setValueIfDefined(this, 'queryParams', parameters);
@@ -15,7 +23,7 @@ ResponseDesc.prototype = {
     },
 
     withHeaders: function (headers) {
-        setValueIfDefined(this, 'requiredHeaders', headers);
+        setValueIfDefined(this, 'requiredHeaders', withLoweredKeys(headers));
         return this;
     },
 
@@ -32,14 +40,14 @@ ResponseDesc.prototype = {
     sendResponseBody: function (data) {
         if (typeof data == 'object')
             this.responseBody = data;
-        else if(typeof data == 'string')
+        else if (typeof data == 'string')
             this.responseBody = decodeURIComponent(data.replace(/&quot;/g, '"'));
         else
             this.responseBody = 'Corrupted Data.';
         return this;
     },
 
-    sendResponseHeaders: function(headers) {
+    sendResponseHeaders: function (headers) {
         setValueIfDefined(this, 'responseHeaders', headers);
         return this;
     },

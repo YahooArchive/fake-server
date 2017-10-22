@@ -30,12 +30,12 @@ describe('ResponseDescBuilder Test', function () {
     });
 
     describe('withHeaders(headers)', function () {
-        it('should set "requiredHeaders" key with given header', function () {
+        it('should set "requiredHeaders" key with given header making key\'s of header to lower case', function () {
             var requiredHeaders = {'Cookie': 'username=.*'};
             var fakeResponseDesc = new ResponseDescBuilder('/foo/bar')
                 .withHeaders(requiredHeaders);
 
-            assert.deepEqual(fakeResponseDesc.requiredHeaders, requiredHeaders)
+            assert.deepEqual(fakeResponseDesc.requiredHeaders, {'cookie': 'username=.*'})
         });
 
         it('should not add "requiredHeaders" key when no headers is passed', function () {
@@ -114,10 +114,10 @@ describe('ResponseDescBuilder Test', function () {
             var fakeResponseDesc = new ResponseDescBuilder('/foo/bar')
                 .sendResponseHeaders(responseHeaders);
 
-            assert.equal(fakeResponseDesc.responseHeaders, responseHeaders)
+            assert.deepEqual(fakeResponseDesc.responseHeaders, responseHeaders)
         });
 
-        it('should not set "responseHeaders" key no header is given', function () {
+        it('should not set "responseHeaders" key when no header is given', function () {
             var fakeResponseDesc = new ResponseDescBuilder('/foo/bar')
                 .sendResponseHeaders();
 
