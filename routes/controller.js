@@ -15,7 +15,7 @@ var ResponseDescBuilder = require('../libs/responseDescBuilder.js');
 var merge = require('merge');
 
 // Preload routes 
-FakeResponse.preload(argv.defaultRoutesDir || require(path.join(__dirname, '../config.json')).DEFAULT_ROUTES_PATH);
+FakeResponse.preload(argv.defaultRoutesDir || require(path.resolve('./config.json')).DEFAULT_ROUTES_PATH);
 
 var controller = {
     fakeResponse: FakeResponse, // of course this is here just so that it can be overwritten easily in the tests.
@@ -45,7 +45,7 @@ var controller = {
 
         function send(statusCode, responseHeaders, responseBody) {
             var contentTypeApplicationJson = {"Content-Type": "application/json"};
-            var contentTypeTextHtml = {"Content-Type": "'text/html'"};
+            var contentTypeTextHtml = {"Content-Type": "text/html"};
 
             if (typeof responseBody === "object") {
                 try {
@@ -53,10 +53,12 @@ var controller = {
                     responseHeaders = merge(contentTypeApplicationJson, responseHeaders)
                 } catch (e) {
                     responseBody = "Unable to serialize responseBody";
+                    responseHeaders = contentTypeTextHtml;
                     res.statusCode = 500;
                 }
+            } else {
+                responseHeaders = merge(contentTypeTextHtml, responseHeaders);
             }
-            responseHeaders = merge(contentTypeTextHtml, responseHeaders);
             responseHeaders['Content-Length'] = Buffer.byteLength(responseBody);
 
             res.writeHead(statusCode, responseHeaders);
@@ -72,6 +74,11 @@ var controller = {
                     fs.readFile(path.join(bestMatch.responseData), 'utf8', function (err, data) {
                         if (err) {
                             res.send(500, "Error reading file at " + path.resolve(bestMatch.responseData));
+                        }
+                        try {
+                            data = JSON.parse(data);
+                        } catch (e) {
+                            console.log("INFO: Unable to parse to JSON. Falling back to read file as text from " + path.resolve(bestMatch.responseData))
                         }
                         send(parseInt(bestMatch.responseCode, 10), bestMatch.responseHeaders, data);
                     });

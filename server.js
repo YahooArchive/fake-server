@@ -15,9 +15,9 @@ server.use(restify.bodyParser());
 
 require('./routes/routes.js')(server);
 
-const PORT = argv.port || require(path.join(__dirname, 'config.json')).PORT;
+const PORT = argv.port || require(path.resolve('./config.json')).PORT;
 
-if (module.parent) { // Manhattan
+if (module.parent) {
     module.exports = server.server;
 } else {
     server.listen(PORT, function () {

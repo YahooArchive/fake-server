@@ -232,7 +232,7 @@ describe('Integration tests', function () {
         }, res, next);
 
 
-        assert.isTrue(res.writeHead.calledWithExactly(200, {"Content-Type": "'text/html'", 'Content-Length': 2}));
+        assert.isTrue(res.writeHead.calledWithExactly(200, {"Content-Type": "text/html", 'Content-Length': 2}));
         assert.isTrue(res.write.calledWithExactly('OK'));
         assert.isTrue(res.end.calledOnce);
     });
