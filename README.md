@@ -196,6 +196,42 @@ The following will delay server response by one second:
 
 To avoid the need to restart fake-server in order to clear the configuration, we've implemented a special endpoint called `/flush`. By sending a `DELETE` request to `http://localhost:3012/flush`, you will erase all previously configured responses.
 
+### Configuring rest-fake-server
+The server can be configured by putting a `config.json` file in the directory where the server is started. Below is a sample configuration file.
+```json
+{
+  "PORT": 3000,
+  "DEFAULT_ROUTES_PATH": "./default_routes"
+}
+```
+The `PORT` specifies the server port at which it should listen, in this case `3000`.
+
+`DEFAULT_ROUTES_PATH` specifies the folder path from where it should load the default routes. Notice that `DEFAULT_ROUTES_PATH` is a <strong>directory</strong>. You can put `JSON` files inside this directory. All the files inside this directory will get automatically loaded when `fake-rest-server` starts and will be available for use. Below is a sample `default_routes.json` file.
+```json
+{
+  "routes":[
+    {
+        "route": "/test/one",
+        "responseCode":200,
+        "responseBody": "it works very very fine"
+    },
+    {
+        "route": "/test/two",
+        "responseCode":200,
+        "responseData": "./mock_data/sample.json"
+    },
+    {
+        "route": "/test/three",
+        "requiredHeaders": {
+            "Cookie": "username=.*"
+        },
+        "responseBody": "headers match :-)"
+    }
+  ]
+}
+```
+Notice that it is same as any other configuration that we have previously seen. Just that this one is a array of such configuration.
+
 
 ### Limitations
 - There are three reserved endpoints: `POST` `/add`, `/remove` and  `DELETE` `/flush`. These cannot be used by your application.
