@@ -7,7 +7,7 @@
 /*jshint -W079 */
 'use strict';
 
-var controller = require('../controller.js');
+var controller = require('../routes/controller.js');
 var sinon = require('sinon');
 var assert = require('chai').assert;
 
@@ -22,6 +22,7 @@ describe('Integration tests', function () {
                 route: '/foo/bar',
                 responseCode: '404',
                 responseBody: 'Not found, tche!',
+                responseHeaders: {'Access-Control-Allow-Origin': 'http://localhost:3012'}
             }
         };
         var res = {
@@ -33,6 +34,12 @@ describe('Integration tests', function () {
         controller.add(req, res, function () {});
 
         assert.isTrue(controller.fakeResponse.add.calledOnce);
+        assert.isTrue(controller.fakeResponse.add.calledWith(sinon.match({
+            route: '/foo/bar',
+            responseCode: '404',
+            responseBody: 'Not found, tche!',
+            responseHeaders: {'Access-Control-Allow-Origin': 'http://localhost:3012'}
+        })));
 
         controller.fakeResponse.add.restore();
     });
@@ -157,20 +164,50 @@ describe('Integration tests', function () {
 
         clock.tick(delay - 1);
 
-        assert.isTrue(next.notCalled, 'next should not be called before specified delay');
+        assert.isTrue(res.end.notCalled, 'end should not be called before specified delay');
 
         clock.tick(delay + 1);
 
-        assert.isTrue(next.calledOnce);
+        assert.isTrue(res.end.calledOnce);
 
         clock.restore();
         done();
     });
 
 
-    it('Should Default to header application/json', function () {
+    it('Should respond with header application/json when response is of type JSON', function () {
         var next = sinon.stub(),
 
+            obj = {
+                route: '/abc',
+                responseCode: 200,
+                responseBody: {"foo": "bar"}
+            },
+            req = {
+                params: {
+                    route: '/abc',
+                }
+            },
+            res = {
+                send: sinon.stub(),
+                write: sinon.stub(),
+                writeHead: sinon.stub(),
+                end: sinon.stub()
+            };
+
+        controller.fakeResponse.add(obj);
+
+        controller.match({
+            url: '/abc',
+        }, res, next);
+
+        assert.isTrue(res.writeHead.calledWithExactly(200, {'Content-Type': 'application/json', 'Content-Length': 13}));
+        assert.isTrue(res.write.calledWithExactly(JSON.stringify({"foo": "bar"})));
+        assert.isTrue(res.end.calledOnce);
+    });
+
+    it('Should respond with header text/html when response is of type text', function () {
+        var next = sinon.stub(),
             obj = {
                 route: '/abc',
                 responseCode: 200,
@@ -194,13 +231,13 @@ describe('Integration tests', function () {
             url: '/abc',
         }, res, next);
 
-        
-        assert.isTrue(res.writeHead.calledWithExactly(200, {'Content-Type': 'application/json', 'Content-Length': 2}));
+
+        assert.isTrue(res.writeHead.calledWithExactly(200, {"Content-Type": "text/html", 'Content-Length': 2}));
         assert.isTrue(res.write.calledWithExactly('OK'));
         assert.isTrue(res.end.calledOnce);
     });
 
-    it('should work with POST requests', function() {
+    it('should work with POST requests', function () {
         var next = sinon.stub(),
             obj = {
                 route: '/abc',
@@ -236,11 +273,11 @@ describe('Integration tests', function () {
         assert.isTrue(res.end.calledOnce);
     });
 
-    it('should allow header matching (no-match)', function() {
+    it('should allow header matching (no-match)', function () {
         var config = {
             route: '/x',
             requiredHeaders: {
-                'Cookie': 'A=.*'
+                'cookie': 'A=.*'
             },
             responseCode: 123,
             responseBody: "BLAH"
@@ -253,7 +290,7 @@ describe('Integration tests', function () {
             }
         };
 
-        var res = { 
+        var res = {
             send: sinon.stub(),
             write: sinon.stub(),
             writeHead: sinon.stub(),
@@ -270,7 +307,7 @@ describe('Integration tests', function () {
         var config = {
             route: '/x',
             requiredHeaders: {
-                'Cookie': 'A=.*'
+                'cookie': 'A=.*'
             },
             responseCode: 123,
             responseBody: "BLAH"
@@ -279,15 +316,15 @@ describe('Integration tests', function () {
         var req = {
             url: '/x',
             headers: {
-                'Some': 'thing',
-                'Cookie': 'A=adsfadfadsf'
+                'some': 'thing',
+                'cookie': 'A=adsfadfadsf'
             },
             params: {
                 route: '/x'
             }
         };
 
-        var res = { 
+        var res = {
             send: sinon.stub(),
             write: sinon.stub(),
             writeHead: sinon.stub(),
@@ -300,5 +337,88 @@ describe('Integration tests', function () {
         assert.isTrue(res.write.calledWith('BLAH'));
         assert.isTrue(res.writeHead.calledWith(123));
 
+    });
+
+    it('should provide a way to add new responses for a given endpoint with responseBody containing json object', function () {
+        var req = {
+            params: {
+                route: '/foo/bar',
+                responseCode: '404',
+                responseBody: {"foo": "bar"}
+            }
+        };
+        var res = {
+            send: sinon.stub()
+        };
+
+        sinon.stub(controller.fakeResponse, 'add');
+
+        controller.add(req, res, function () {
+        });
+
+        assert.isTrue(controller.fakeResponse.add.calledOnce);
+
+        assert.isTrue(controller.fakeResponse.add.calledWith(sinon.match({
+            route: '/foo/bar',
+            responseCode: '404',
+            responseBody: {"foo": "bar"}
+        })));
+
+        controller.fakeResponse.add.restore();
+    });
+
+    it('should provide a way to add new responses for a given endpoint with responseData containing relative file path', function () {
+        var req = {
+            params: {
+                route: '/foo/bar',
+                responseCode: '404',
+                responseData: "./foo/bar.json"
+            }
+        };
+        var res = {
+            send: sinon.stub()
+        };
+
+        sinon.stub(controller.fakeResponse, 'add');
+
+        controller.add(req, res, function () {
+        });
+
+        assert.isTrue(controller.fakeResponse.add.calledOnce);
+
+        assert.isTrue(controller.fakeResponse.add.calledWith(sinon.match({
+            route: '/foo/bar',
+            responseCode: '404',
+            responseData: "./foo/bar.json"
+        })));
+
+        controller.fakeResponse.add.restore();
+    });
+
+    it('should provide a way to remove existing best matched endpoint', function () {
+        var req = {
+            params: {
+                route: '/foo/bar',
+                queryParams: {'id': 5, 'username': 'foo'},
+                payload: {'this': 'that'},
+                requiredHeaders: {'Content-Type': 'application/json'},
+                responseCode: '404',
+                responseBody: {"foo": "bar"}
+            }
+        };
+        var res = {
+            send: sinon.stub()
+        };
+
+        sinon.stub(controller.fakeResponse, 'remove');
+
+        controller.remove(req, res, function () {
+        });
+
+        assert.isTrue(controller.fakeResponse.remove.calledOnce);
+
+        assert.isTrue(controller.fakeResponse.remove.calledWith('/foo/bar?id=5&username=foo', {'this': 'that'}, {'Content-Type': 'application/json'}));
+
+        controller.fakeResponse.remove.restore();
     });
 });

@@ -17,19 +17,19 @@ var _ = require('lodash');
 var FakeResponse = {
     _items: [],
 
-    preload: function(pathToConfiguration) {
-        return when.promise(function(resolve, reject) {
-            var configDir = pathToConfiguration || path.join(__dirname, 'default_routes');
-            console.log('loading config from: ',configDir);
-            glob.sync('*.json', {cwd:configDir})
+    preload: function (pathToConfiguration) {
+        return when.promise(function (resolve, reject) {
+            var configDir = pathToConfiguration;
+            console.log('loading default routes from: ', configDir);
+            glob.sync('*.json', {cwd: configDir})
                 .forEach(function eachFile(file) {
-                    var contents = fs.readFileSync(path.join(configDir,file), 'utf8');
+                    var contents = fs.readFileSync(path.join(configDir, file), 'utf8');
                     try {
                         var allRoutes = JSON.parse(contents);
-                        allRoutes.routes.forEach(function(configLine) {
+                        allRoutes.routes.forEach(function (configLine) {
                             FakeResponse.add(configLine);
                         });
-                    } catch(e) {
+                    } catch (e) {
                         console.log('Wrong configuration format');
                         reject(e);
                     }
@@ -44,7 +44,20 @@ var FakeResponse = {
 
     add: function (item) {
         item.numCalls = 0;
+        item.timestamp = new Date().getTime();
         FakeResponse._items.push(item);
+    },
+
+    remove: function (url, payload, headers) {
+        var bestMatch = FakeResponse.match(url, payload, headers);
+        var bestMatchIndex = FakeResponse._items.indexOf(bestMatch);
+
+        if (bestMatchIndex != -1) {
+            var numberOfElementToRemove = 1;
+            FakeResponse._items.splice(bestMatchIndex, numberOfElementToRemove);
+            return true;
+        } else
+            return false;
     },
 
     flush: function () {
@@ -52,7 +65,7 @@ var FakeResponse = {
     },
 
     /*Lexicographic comparison based on: (at, num query + payload params matched, num headers matched)*/
-    compareMatches: function(matchA, matchB) {
+    compareMatches: function (matchA, matchB) {
         /*First rank on 'at' match*/
         if (!matchA.hasOwnProperty('at') && matchB.hasOwnProperty('at')) {
             return 1;
@@ -71,8 +84,15 @@ var FakeResponse = {
             return queryCmp;
         }
 
-        /*If still tied, rank on quality of 'headers' match*/
-        return Object.keys(matchB.requiredHeaders || {}).length - Object.keys(matchA.requiredHeaders || {}).length;
+        /*Third rank on the number of 'headers' match*/
+        var numHeadersMatchedB = Object.keys(matchB.requiredHeaders || {}).length;
+        var numHeadersMatchedA = Object.keys(matchA.requiredHeaders || {}).length;
+        var headerCmp = numHeadersMatchedB - numHeadersMatchedA;
+        if(0 !== headerCmp)
+            return headerCmp;
+
+        /*If still tied, rank on latest response*/
+        return matchB.timestamp - matchA.timestamp;
     },
 
 
@@ -81,18 +101,18 @@ var FakeResponse = {
         uri = url.parse(uri, true);
 
         return FakeResponse._items.filter(function (item) {
-            var doPathsMatch = uri.pathname.match(new RegExp(item.route));
+                var doPathsMatch = uri.pathname.match(new RegExp(item.route));
 
-            if (doPathsMatch !== null) {
-                item.numCalls += 1;
-                if(item.queryParams && !FakeResponse.matchRegex(item.queryParams, uri.query)) return false;
-                if(item.payload && !FakeResponse.matchRegex(item.payload, payload)) return false;
-                if(item.requiredHeaders && !FakeResponse.matchRegex(item.requiredHeaders, headers)) return false;
-                if (item.at) return (item.numCalls === item.at);
-                return true;
-            }
-            return false;
-        }).sort(FakeResponse.compareMatches)[0] || null;
+                if (doPathsMatch !== null) {
+                    item.numCalls += 1;
+                    if (item.queryParams && !FakeResponse.matchRegex(item.queryParams, uri.query)) return false;
+                    if (item.payload && !FakeResponse.matchRegex(item.payload, payload)) return false;
+                    if (item.requiredHeaders && !FakeResponse.matchRegex(item.requiredHeaders, headers)) return false;
+                    if (item.at) return (item.numCalls === item.at);
+                    return true;
+                }
+                return false;
+            }).sort(FakeResponse.compareMatches)[0] || null;
     },
 
     /*
@@ -101,10 +121,10 @@ var FakeResponse = {
      * @param {objB} An object whose values will be matched against objA's values
      * @return {boolean} If objB matches all regular expressions
      */
-    matchRegex: function(objA, objB) {
+    matchRegex: function (objA, objB) {
         if (typeof(objB) !== "object" || typeof(objA) !== "object") return false;
 
-        return Object.keys(objA).every(function(path) {
+        return Object.keys(objA).every(function (path) {
             var value = _.get(objB, path);
             if (!value) return false;
 

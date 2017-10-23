@@ -1,37 +1,44 @@
 {
-  "name": "fake-server",
-  "version": "0.1.0",
-  "description": "Fake-server: mock the internet.",
+  "name": "fake-rest-server",
+  "version": "0.1.5",
+  "description": "Fake-REST-Server: Mock the Internet.",
   "main": "server.js",
   "license": "BSD",
-  "author": "Yahoo!",
+  "author": "Yahoo! and Others",
   "contributors": [
     "bigodines <matheus@yahoo-inc.com>",
-    "Julio Nobrega <julionn@yahoo-inc.com>"
+    "Julio Nobrega <julionn@yahoo-inc.com>",
+    "Rahul Nandi <rahulnandi199@gmail.com>",
+    "Vikash Upadhyay <vikasku@thoughtworks.com>"
   ],
+  "engines": {
+    "node": ">= 0.10.x",
+    "npm": ">= 1.4.x"
+  },
+  "bin": {
+    "fake-rest-server": "./bin/fake-rest-server"
+  },
   "scripts": {
     "test": "./node_modules/.bin/mocha -c --recursive -R spec",
     "start": "node server.js"
   },
   "repository": {
     "type": "git",
-    "url": "git@github.com:yahoo/fake-server.git"
+    "url": "git@github.com:crazylab/fake-server.git"
   },
   "readmeFilename": "README.md",
   "devDependencies": {
+    "chai": "^4.1.2",
     "mocha": "~1.18.2",
-    "jshint": "~2.5.0",
     "sinon": "~1.9.1",
-    "chai": "=1.9.1"
+    "rewire": "~2.3.4"
   },
   "dependencies": {
-    "glob": "~5.0.14",
-    "lodash": "~3.10.1",
+    "glob": "~7.1.2",
+    "lodash": "~4.17.4",
     "merge": "^1.2.0",
-    "restify": "=2.6.2",
-    "rewire": "~2.3.4",
-    "sinon-chai": "~2.5.0",
-    "when": "~3.7.3",
-    "yargs": "~3.18.0"
+    "restify": "~4.2.0",
+    "when": "~3.7.8",
+    "yargs": "~7.1.0"
   }
 }
