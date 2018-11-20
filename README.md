@@ -1,5 +1,7 @@
 #fake-server
 
+** Please Note: ** This repo is no longer maintained and has known security vulnerabilities. Use at your own risk!
+
 [![Build Status](https://travis-ci.org/yahoo/fake-server.svg)](https://travis-ci.org/yahoo/fake-server)
 
 Fake-server is a generic and non-intrusive tool used to mock any server response. It has been designed to address issues when running tests against unstable or slow external servers.
