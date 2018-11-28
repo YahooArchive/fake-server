@@ -18,7 +18,7 @@ describe('FakeResponse model tests', function () {
     });
 
     it('should return null if no routes have been added', function() {
-        var response = model.match('/match/me');
+        var response = model.match(false, '/match/me');
         assert.equal(null, response);
      });
 
@@ -63,11 +63,36 @@ describe('FakeResponse model tests', function () {
 
         model.add(obj);
 
-        var response = model.match('/foo/bar');
+        var response = model.match(false,{url:'/foo/bar'});
 
         assert.deepEqual(response, obj);
     });
 
+    
+
+    it('should match successfully a route with the expected answers based in request with verb', function () {
+        var obj = {
+            route: '/foo/bar',
+            responseCode: 200,
+            verb: 'GET',
+            responseBody: 'foo',
+        };
+
+        model.add({
+            route: '/foo/bar',
+            responseCode: 200,
+            verb: 'PUT',
+            responseBody: 'foo2',
+        });
+
+        model.add(obj);
+
+        var response = model.match(false,{url:'/foo/bar', method:'GET'});
+
+        assert.deepEqual(response, obj);
+    });
+
+    
     it('should match based on regexp', function () {
         var obj = {
             route: '/foo.*',
@@ -83,7 +108,7 @@ describe('FakeResponse model tests', function () {
             responseBody: '§xxx',
         });
 
-        var response = model.match('/foo/bar');
+        var response = model.match(false,{url:'/foo/bar'});
 
         assert.deepEqual(response, obj);
     });
@@ -108,11 +133,11 @@ describe('FakeResponse model tests', function () {
             at: 2
         });
 
-        var firstReq = model.match('/match/me');
+        var firstReq = model.match(false,{url:'/match/me'});
         assert.equal(200, firstReq.responseCode);
-        var secondReq = model.match('/match/me');
+        var secondReq = model.match(false,{url:'/match/me'});
         assert.equal(204, secondReq.responseCode);
-        var thirdReq = model.match('/match/me');
+        var thirdReq = model.match(false,{url:'/match/me'});
         assert.equal(200, thirdReq.responseCode);
     });
 
@@ -144,7 +169,7 @@ describe('FakeResponse model tests', function () {
             responseBody: 'weba',
         });
         /*even though "uri"  is the same, we are only matching if payload contains id:1 */
-        var response = model.match('/match/me');
+        var response = model.match(false,{url:'/match/me'});
         assert.equal(null, response);
      });
 
@@ -166,7 +191,10 @@ describe('FakeResponse model tests', function () {
             responseBody: 'buuu'
         });
         /*even though "uri"  is the same, we are only matching if payload contains id:1 */
-        var response = model.match('/match/me', { id: 1 });
+        var response = model.match(false,{url:'/match/me', body:{'id': 1}});
+        
+        assert.equal(2, model.getAll().length);
+        
         assert.deepEqual(response.responseBody, 'weba');
         assert.deepEqual(response.responseCode, 200);
      });
@@ -189,7 +217,7 @@ describe('FakeResponse model tests', function () {
             responseBody: 'buuu'
         });
 
-        var response = model.match('/match/me', { outer: [{inner: 1 }]});
+        var response = model.match(false,{url:'/match/me', body:{ outer: [{inner: 1 }]}});
         assert.deepEqual(response.responseBody, 'weba');
         assert.deepEqual(response.responseCode, 200);
      });
@@ -204,11 +232,11 @@ describe('FakeResponse model tests', function () {
             responseBody: 'weba'
         });
 
-        var response = model.match('/match/me?outer[0].inner=1');
+        var response = model.match(false,{url:'/match/me?outer[0].inner=1'});
         assert.deepEqual(response.responseBody, 'weba');
         assert.deepEqual(response.responseCode, 200);
 
-        response = model.match('/match/me?param=1');
+        response = model.match(false,{url:'/match/me?param=1'});
         assert.deepEqual(response, null);
      });
      it('should match POST request payloads using explicit regular expressions', function() {
@@ -220,7 +248,7 @@ describe('FakeResponse model tests', function () {
             responseCode: 200,
             responseBody: 'Regex success',
         });
-        var response = model.match('/match/me', { id: 9273892 });
+        var response = model.match(false,{url:'/match/me', body:{ id: 9273892 }});
         assert.deepEqual(response.responseBody, 'Regex success');
         assert.deepEqual(response.responseCode, 200);
 
@@ -233,12 +261,12 @@ describe('FakeResponse model tests', function () {
             responseCode: 200,
             responseBody: 'Regex success',
         });
-        response = model.match('/match/me', { a: 2, b:"baz" });
+        response = model.match(false,{url:'/match/me', body:{ a: 2, b:"baz" }});
         assert.deepEqual(response.responseBody, 'Regex success');
         assert.deepEqual(response.responseCode, 200);
 
         // Non-matching payload (bazz) should fail
-        response = model.match('/match/me', { a: 2, foo:"bazz" });
+        response = model.match(false,{url:'/match/me', body:{ a: 2, foo:"bazz" }});
         assert.equal(null, response);
      });
 
@@ -255,12 +283,12 @@ describe('FakeResponse model tests', function () {
              responseBody: 'Query param success'
          });
 
-         var response = model.match('/match/me?a=1&b=2');
+         var response = model.match(false,{url:'/match/me?a=1&b=2'});
          assert.deepEqual(response.responseCode, 200);
          assert.deepEqual(response.responseBody, 'Query param success');
 
          // Varying order of query params shouldn't affect matching
-         response = model.match('/match/me?a=1&b=2');
+         response = model.match(false,{url:'/match/me?a=1&b=2'});
          assert.deepEqual(response.responseCode, 200);
          assert.deepEqual(response.responseBody, 'Query param success');
 
@@ -274,12 +302,12 @@ describe('FakeResponse model tests', function () {
          });
 
          // query params with spaces should work
-         response = model.match('/match/me?name=Fabio Hirata');
+         response = model.match(false,{url:'/match/me?name=Fabio Hirata'});
          assert.deepEqual(response.responseCode, 200);
          assert.deepEqual(response.responseBody, 'Space success');
 
          // ...even if encoded with +
-         response = model.match('/match/me?name=Fabio+Hirata');
+         response = model.match(false,{url:'/match/me?name=Fabio+Hirata'});
          assert.deepEqual(response.responseCode, 200);
          assert.deepEqual(response.responseBody, 'Space success');
      });
@@ -295,15 +323,15 @@ describe('FakeResponse model tests', function () {
              responseBody: 'Regex success'
          });
 
-         var response = model.match('/match/me?a=0');
+         var response = model.match(false,{url:'/match/me?a=0'});
          assert.deepEqual(response.responseCode, 200);
          assert.deepEqual(response.responseBody, 'Regex success');
 
-         response = model.match('/match/me?a=9');
+         response = model.match(false,{url:'/match/me?a=9'});
          assert.deepEqual(response.responseCode, 200);
          assert.deepEqual(response.responseBody, 'Regex success');
 
-         response = model.match('/match/me?a=1234567890');
+         response = model.match(false,{url:'/match/me?a=1234567890'});
          assert.deepEqual(response.responseCode, 200);
          assert.deepEqual(response.responseBody, 'Regex success');
 
@@ -320,7 +348,7 @@ describe('FakeResponse model tests', function () {
              responseBody: 'Regex success'
          });
 
-         response = model.match('/match/me?e=bar&b=12345&c=6789&d=1');
+         response = model.match(false,{url:'/match/me?e=bar&b=12345&c=6789&d=1'});
          assert.deepEqual(response.responseCode, 200);
          assert.deepEqual(response.responseBody, 'Regex success');
      });
@@ -346,18 +374,18 @@ describe('FakeResponse model tests', function () {
          model.add(route1);
          model.add(route2);
 
-         var response = model.match('/match/me?a=1234', {b: 'abcd'});
+         var response = model.match(false,{url:'/match/me?a=1234', body:{b: 'abcd'}});
          assert.equal(response.responseCode, 200);
-         response = model.match('/match/me?a=1234', {b: 'abc123'});
+         response = model.match(false,{url:'/match/me?a=1234', body:{b: 'abc123'}});
          assert.equal(response.responseCode, 400);
 
          model.flush();
          model.add(route2);
          model.add(route1);
 
-         response = model.match('/match/me?a=1234', {b: 'abcd'});
+         response = model.match(false,{url:'/match/me?a=1234', body:{b: 'abcd'}});
          assert.equal(response.responseCode, 200);
-         response = model.match('/match/me?a=1234', {b: 'abc123'});
+         response = model.match(false,{url:'/match/me?a=1234', body:{b: 'abc123'}});
          assert.equal(response.responseCode, 400);
      });
 
@@ -383,14 +411,14 @@ describe('FakeResponse model tests', function () {
          };
          model.add(route1);
          model.add(route2);
-         var response = model.match('/match/me?a=1234', null, { Cookie: 'Y=abcd' });
+         var response = model.match(false,{url:'/match/me?a=1234', headers:{ Cookie: 'Y=abcd' }});
          assert.equal(response.responseCode, 200);
 
          model.flush();
          model.add(route1);
          model.add(route2);
 
-         response = model.match('/match/me?a=1234');
+         response = model.match(false,{url:'/match/me?a=1234'});
          assert.equal(response.responseCode, 400);
     });
 });

@@ -301,4 +301,80 @@ describe('Integration tests', function () {
         assert.isTrue(res.writeHead.calledWith(123));
 
     });
+    
+    it('should provide a way to delete one response for a given endpoint', function () {
+        var req = {
+            params: {
+                route: '/foo/bar',
+                responseCode: 404,
+                verb: 'GET',
+                responseBody: 'You want to delete something',
+            }
+        };
+      
+        var res = {
+                send: sinon.stub(),
+                write: sinon.stub(),
+                writeHead: sinon.stub(),
+                end: sinon.stub()
+            };
+
+        sinon.stub(controller.fakeResponse, 'add');
+        
+        controller.add(req, res, function () {});
+        
+        sinon.stub(controller.fakeResponse, 'match');
+        
+        controller.delOne(req, res, function () {});
+        
+        assert.isTrue(controller.fakeResponse.match.calledOnce);
+        
+        controller.fakeResponse.match.restore();
+    });
+    
+    
+    it('should allow different behaviours for the same request based on the verb', function () {
+    	var responses = [{
+            route: '/',
+            responseCode: 200,
+            responseBody: 'OK',
+            numCalls: 0,
+            verb: 'GET'
+        }, {
+            route: '/',
+            responseCode: 403,
+            responseBody: 'yay!',
+            at: 3,
+            numCalls: 0,
+            verb: 'POST'
+        }];
+
+        var req = {
+            url: '/',
+            method: 'GET'
+        };
+        
+        var req2 = {
+                url: '/',
+                method: 'POST'
+            };
+
+        var res = {
+            write: sinon.stub(),
+            writeHead: sinon.stub(),
+            send: sinon.stub(),
+            end: sinon.stub()
+        };
+
+        controller.fakeResponse._items = responses;
+
+        controller.match(req, res, function () {});
+        res.writeHead.calledWithExactly(200, {'Content-Type': 'application/json', 'Content-Length': 2})
+        res.write.lastCall.calledWithExactly('OK');
+
+        controller.match(req2, res, function () {});
+        res.writeHead.calledWithExactly(403, {'Content-Type': 'application/json', 'Content-Length': 4})
+        res.write.lastCall.calledWithExactly('yay!');
+
+    });
 });

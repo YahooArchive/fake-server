@@ -130,6 +130,20 @@ note that I will be adding an 'at' parameter to configure the special behavior t
 > responseBody: 'Thou shall not pass!',  
 > at: 3 }  
 
+##### Same endpoint with different verbs/method
+
+Now, you can do a GET and POST at the same endpoint  
+
+> { route: 'login',  
+> responseCode: 200,  
+> responseBody: 'ok',
+> verb: 'GET' }  
+
+> { route: 'login',  
+> responseCode: 200,  
+> responseBody: 'You are doing a POST',
+> verb: 'POST' } 
+
 
 ##### Delay response
 
@@ -140,10 +154,23 @@ The following will delay server response in one second:
 > responseBody: 'OK',  
 > delay: 1000 }  
 
-##### Resetting server configuration
+
+### Delete one petition
+
+Sometimes, you want to remove an entry. So, now you can.
+
+All you have to do is 'DELETE' to http://localhost:3012/delOne the following data:
+
+Delete /test by deleting:
+> { route: 'test',  
+> responseCode: 200,  
+> verb: "GET" }  
+
+
+#### Resetting server configuration
 
 To avoid the need to restart fake-server in order to clear the configuration, we've implemented a special endpoint called `/flush`. By sending a `DELETE` request to http://localhost:3012/flush, you will erase all previously configured responses.
 
 
 ### Limitations
-- There are two reserved endpoints: POST '/add' and  `DELETE` '/flush'. These cannot be used by your application.
+- There are reserved endpoints: POST '/add', GET '/getAll', DELETE '/delOne' and DELETE, '/flush'. These cannot be used by your application.

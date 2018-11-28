@@ -47,6 +47,7 @@ var FakeResponse = {
         FakeResponse._items.push(item);
     },
 
+   
     flush: function () {
         FakeResponse._items = [];
     },
@@ -76,25 +77,68 @@ var FakeResponse = {
     },
 
 
-    /* Filters all items that match the URL and then tries to check if there is a specific behavior for the Nth call on the same endpoint */
-    match: function (uri, payload, headers) {
-        uri = url.parse(uri, true);
-
-        return FakeResponse._items.filter(function (item) {
-            var doPathsMatch = uri.pathname.match(new RegExp(item.route));
-
-            if (doPathsMatch !== null) {
-                item.numCalls += 1;
-                if(item.queryParams && !FakeResponse.matchRegex(item.queryParams, uri.query)) return false;
-                if(item.payload && !FakeResponse.matchRegex(item.payload, payload)) return false;
-                if(item.requiredHeaders && !FakeResponse.matchRegex(item.requiredHeaders, headers)) return false;
-                if (item.at) return (item.numCalls === item.at);
-                return true;
-            }
-            return false;
-        }).sort(FakeResponse.compareMatches)[0] || null;
+    /*
+     * If del --> false 
+     * Filters all items that match the URL and then tries to check if there is
+     * a specific behavior for the Nth call on the same endpoint.
+     * If del --> true
+     * Filters all items that match the URL, verb and responseCode and then del this endpoint.
+     */
+        match: function (del, req, res) {
+        	
+            var uri ='';
+            var verb = '';
+            var payload='';
+            var headers='';
+            
+            return FakeResponse._items.filter(function (item) {
+                    if(!del){
+                        uri = req.url;
+                        uri= url.parse(uri, true);
+                        var doPathsMatch = uri.pathname.match(new RegExp(item.route));
+                        if (doPathsMatch !== null) {
+                            item.numCalls += 1;
+                            
+                            verb = req.method;
+                            if(item.verb && !(item.verb==verb)) return false;
+                            
+                            if(item.queryParams && !FakeResponse.matchRegex(item.queryParams, uri.query)) return false;
+                            
+                            payload=req.body;
+                            if(item.payload && !FakeResponse.matchRegex(item.payload, payload)) return false;
+                            
+                            headers = req.headers;
+                            if(item.requiredHeaders && !FakeResponse.matchRegex(item.requiredHeaders, headers)) return false;
+                            
+                            if (item.at) return (item.numCalls === item.at);
+                            return true;
+                        }
+                    }else{
+                        uri = req.params.route;
+                        uri= url.parse(uri, true);
+                        
+                        var doPathsMatch = uri.pathname.match(new RegExp(item.route));
+                        
+                        if (doPathsMatch !== null) {
+                            verb = req.params.verb;
+                            if(item.verb && !(item.verb==verb)) return false;
+                            
+                            var responseCode = req.params.responseCode;
+                            if(item.responseCode && !(item.responseCode==responseCode)) return false;
+                            var index  = FakeResponse._items.indexOf(item);
+                            if (index > -1) {
+                                 FakeResponse._items.splice(index, 1);
+                                 return true;
+                            }else{
+                                  return false;
+                            }
+                    }
+                }
+                return false;
+            }).sort(FakeResponse.compareMatches)[0] || null;
+        
     },
-
+    
     /*
      * Match objB's values against regular expressions stored in objA. Key equality determines values to test.
      * @param {objA} An object whose string values represent regular expressions
